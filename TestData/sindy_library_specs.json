@@ -1,0 +1,78 @@
+{
+    "Q tensor": {
+        "u": {
+            "maxf": 1,
+            "maxd": 1,
+            "root": "vel"
+        },
+        "v": {
+            "maxf": 1,
+            "maxd": 1,
+            "root": "vel"
+        },
+        "Qxx": {
+            "maxf": 3,
+            "maxd": 2,
+            "root": "Q"
+        },
+        "Qxy": {
+            "maxf": 3,
+            "maxd": 2,
+            "root": "Q"
+        },
+        "constraints": {
+            "func_order": 3,
+            "diff_order": 2
+        }
+    },
+    "Fluid": {
+        "u": {
+            "maxf": 1,
+            "maxd": 0,
+            "root": "vel"
+        },
+        "v": {
+            "maxf": 1,
+            "maxd": 0,
+            "root": "vel"
+        },
+        "\u03C9": {
+            "maxf": 1,
+            "maxd": 1,
+            "root": "vort"
+        },
+        "Qxx": {
+            "maxf": 2,
+            "maxd": 3,
+            "root": "Q"
+        },
+        "Qxy": {
+            "maxf": 2,
+            "maxd": 3,
+            "root": "Q"
+        },
+        "constraints": {
+            "func_order": 2,
+            "diff_order": 3
+        }
+    },
+    "Overdamped": {
+        "Qxx": {
+            "maxf": 4,
+            "maxd": 3,
+            "root": "Q"
+        },
+        "Qxy": {
+            "maxf": 4,
+            "maxd": 3,
+            "root": "Q"
+        },
+        "constraints": {
+            "func_order": 4,
+            "diff_order": 3
+        }
+    },
+    "num_windows": 1000,
+    "window_size": 5,
+    "sample": 1
+}

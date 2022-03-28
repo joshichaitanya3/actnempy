@@ -1,0 +1,29 @@
+###
+
+# Matplotlib style file for the plots involved in the ANISE (Active 
+# Nematic Identification of Sparse Equations) paper.
+
+# Code by Chaitanya Joshi (chaitanya@brandeis.edu)
+
+###
+
+# Latex settings
+
+text.usetex : True
+text.latex.preamble : \usepackage{mathabx}\usepackage{graphicx}\usepackage[T1]{fontenc}
+font.family : serif
+font.serif: ["Computer Modern"]
+
+# Font and plot settings
+
+font.size : 12 # prx font size
+lines.linewidth : 1
+lines.markersize : 8
+
+# Figure properties
+
+# Figure width is 8.6 cm (half column width in PRX)
+# The height is set to 3/4th of the width by default
+
+figure.figsize : 3.385826771653543, 2.5393700787401574 
+figure.dpi : 300
