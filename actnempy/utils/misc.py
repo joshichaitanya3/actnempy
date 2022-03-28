@@ -22,6 +22,10 @@ except ImportError:
     no_rng = True
 
 def isnotebook():
+    '''
+    Function to determine whether the code is running in a notebook or not. Helpful while running code that generates plots.
+    Taken from https://stackoverflow.com/a/39662359
+    '''
     try:
         shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':

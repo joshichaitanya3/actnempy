@@ -15,7 +15,6 @@ some modifications of the functions available in the original PDE-FIND framework
 
 import numpy as np
 import matplotlib.pyplot as plt 
-from .PDE_FIND import TrainSTRidge
 from .library_tools import get_term_val
 import warnings 
 from ..utils.grid import Grid
@@ -433,37 +432,7 @@ class PDE:
 
         except KeyError:
             print(f"Some keys not found. The PDE isn't saved properly!")
-    
-    def stridge(self, lam=10**-5, d_tol=10**-5):
-        '''
-        stridge(lam, d_tol)
-        
-        Use the method of Sequential Thresholded Ridge Regression (STRidge)
-        from (Rudy2017) to get the sparse model. The optimal model is  
-        printed, along with the r-squared score.
-
-        Parameters
-        ----------
-        lam : float, optional
-            Penalty for the 2-norm of the coefficients for Ridge Regression.
-            Default is 10**-5
-        d_tol : float, optional
-            Hyperparameter to specify the sparsity level
-            Default is 10**-5
-
-        Returns
-        -------
-        w : ndarray
-            Vector of coefficients in the optimal model
-        r2 : float
-            r-squared score for the optimal model
-
-        '''
-        (w, r2) = TrainSTRidge(self.Xa, self.ya, lam, d_tol)
-        print(f"R-squared: {r2:g}")
-        print_pde(w, self.desc)
-        return (w, r2)
-    
+   
     def plot_fvu(self,nterms=None,var='var',filename=None):
         '''
         plot_fvu()

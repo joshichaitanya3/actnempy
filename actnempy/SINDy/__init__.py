@@ -19,8 +19,6 @@ from .library_tools import convert_to_lib_as_type
 from .library_tools import build_constrained_library_array
 from .library_tools import combine_terms
 
-from .PDE_FIND import TrainSTRidge
-
 from .weak_form import TestFunction
 from .weak_form import TestRxx
 from .weak_form import TestRxy
