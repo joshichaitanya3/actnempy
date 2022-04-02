@@ -21,22 +21,6 @@ try:
 except ImportError:
     no_rng = True
 
-def isnotebook():
-    '''
-    Function to determine whether the code is running in a notebook or not. Helpful while running code that generates plots.
-    Taken from https://stackoverflow.com/a/39662359
-    '''
-    try:
-        shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True   # Jupyter notebook or qtconsole
-        elif shell == 'TerminalInteractiveShell':
-            return False  # Terminal running IPython
-        else:
-            return False  # Other type (?)
-    except NameError:
-        return False      # Probably standard Python interpreter
-
 def denoise(arr):
     """
     denoise(arr)
@@ -143,7 +127,7 @@ def compute_Q(theta,sigma=1,custom_kernel=None):
     Function to calculate S (scalar order), Qxx and Qxy, given the 
     orientation field theta. 
     The calculation proceeds by computing the molecular tensor 
-    m = n \outer n - 1/2 I and coarse graining it. 
+    m = n \\otimes n - 1/2 I and coarse graining it. 
     The default averaging is done by a gaussian filter with sigma=1.
     A different value of sigma can be provided, or an entirely custom
     kernel can also be provided.

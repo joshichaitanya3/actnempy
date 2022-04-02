@@ -10,7 +10,6 @@ from .misc import set_boundary
 from .misc import set_boundary_region
 from .misc import count_NaNs
 from .misc import get_random_sample
-from .misc import isnotebook
 
 from .grid import Grid 
 

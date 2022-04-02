@@ -15,7 +15,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import numpy as np 
 import matplotlib.pyplot as plt 
 import json
-from .utils import nematic_plot, compute_n, Grid, func_defectfind, func_defectpos, func_defectorient, func_plotdefects, isnotebook
+from .utils import nematic_plot, compute_n, Grid, func_defectfind, func_defectpos, func_defectorient, func_plotdefects
 from tqdm import tqdm
 from scipy.signal import correlate
 import sys
@@ -168,7 +168,7 @@ class ActNem:
         plt.ioff()
         plt.show()
 
-    def compute_divergence(self, frame=0, plot=False):
+    def compute_divergence(self, frame=0, plot=False, show=False):
         '''
         compute_divergence(self, frame=0, plot=False)
 
@@ -184,6 +184,9 @@ class ActNem:
         plot : bool, optional
             Flag to indicate whether to plot the spatial map of the
             divergence. Default is false
+        show: bool, optional
+            Flag to indicate whether to show the output of the plot.
+            Default is False
         
         Returns
         -------
@@ -209,7 +212,7 @@ class ActNem:
             nematic_plot(self.x, self.y, nx.T, ny.T, density=2.0, color='gray')
             plt.title('Director and Divergence')
             plt.savefig(f'{self.vis_dir}/divergence_{frame}.png')
-            if isnotebook():
+            if show:
                 plt.show()
             else:
                 plt.close(fig)
@@ -313,7 +316,7 @@ class ActNem:
         print(f"Orientation autocorrelation time: {tcorr} frames, {self.dt*tcorr} seconds.")
         return ocorr
 
-    def find_defects(self, filter_radius=5, size_thresh=60, switchsign=0, frame=0, plot=False):
+    def find_defects(self, filter_radius=5, size_thresh=60, switchsign=0, frame=0, plot=False, show=False):
         '''
         find_defects(filter_radius=5, size_thresh=60, switchsign=0,
         frame=0, plot=False)
@@ -338,7 +341,10 @@ class ActNem:
             Frame number. Default is 0
         plot: bool, optional
             Flag to indicate whether to plot the frame with defects.
-        
+            Default is False
+        show: bool, optional
+            Flag to indicate whether to show the output of the plot.
+            Default is False
         Returns
         -------
         centroids_p : ndarray
@@ -389,7 +395,7 @@ class ActNem:
             plt.title(f"t = {frame*self.dt} seconds")
             plt.tight_layout()
             plt.savefig(f'{self.vis_dir}/defects_{frame}.png')
-            if isnotebook():
+            if show:
                 plt.show()
             else:
                 plt.close(fig)
