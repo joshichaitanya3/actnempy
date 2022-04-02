@@ -19,6 +19,6 @@ pip install .
 
 # Usage
 
-Basic usage is showcased under `examples/basic_example.ipynb`
+Basic usage is showcased under [examples/basic_example.ipynb](https://github.com/joshichaitanya3/actnempy/blob/main/examples/basic_example.ipynb)
 
-Analysis of an entire trajectory is shown under `examples/analyze_trajectory.ipynb`
+Analysis of an entire trajectory is shown under [examples/analyze_trajectory.ipynb](https://github.com/joshichaitanya3/actnempy/blob/main/examples/analyze_trajectory.ipynb)
