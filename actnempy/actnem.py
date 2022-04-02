@@ -245,16 +245,13 @@ class ActNem:
             divu = self.compute_divergence(frame=i, plot=plot)
             means[i] = divu.mean()
         
-        print(
-            f"Divergence of velocity: {means.mean()} \u00B1 {means.std()} (in 1/seconds)")
-        
         return means
 
     def _autocorr_vector(self, vx, vy):
         '''
         
         Function to compute the autocorrelation in time of a vector.
-        \expval{ \vec{v}(t+t') \cdot \vec{v}(t') }_{t'}
+        \\expval{ \\vec{v}(t+t') \cdot \\vec{v}(t') }_{t'}
 
         '''
 
@@ -276,6 +273,9 @@ class ActNem:
         vcorr : ndarray
             Array of dimensions (NT,) containing the velocity time correlation function.
         
+        tc : float
+            The autocorrelation time in physical time units (dt * autocorelation time in frames)
+        
         '''
         corrs = np.zeros([self.NX*self.NY,self.NT])
         for i in range(self.NX):
@@ -286,8 +286,8 @@ class ActNem:
                 corrs[idx, :] = self._autocorr_vector(vxp, vyp)
         vcorr = np.mean(corrs, axis=0)
         tcorr = np.argmin(vcorr>1/np.exp(1)) # In frames
-        print(f"Velocity autocorrelation time: {tcorr} frames, {self.dt*tcorr} seconds.")
-        return vcorr
+        tc = self.dt * tcorr
+        return vcorr, tc
     
     def orientation_autocorr(self):
         '''
@@ -300,6 +300,9 @@ class ActNem:
 
         ocorr : ndarray
             Array of dimensions (NT,) containing the orientation time correlation function.
+
+        tc : float
+            The autocorrelation time in physical time units (dt * autocorelation time in frames)
         
         '''
         corrs = np.zeros([self.NX*self.NY,self.NT])
@@ -313,8 +316,8 @@ class ActNem:
 
         ocorr = np.mean(corrs, axis=0)
         tcorr = np.argmin(ocorr>1/np.exp(1)) # In frames
-        print(f"Orientation autocorrelation time: {tcorr} frames, {self.dt*tcorr} seconds.")
-        return ocorr
+        tc = self.dt * tcorr
+        return ocorr, tc
 
     def find_defects(self, filter_radius=5, size_thresh=60, switchsign=0, frame=0, plot=False, show=False):
         '''

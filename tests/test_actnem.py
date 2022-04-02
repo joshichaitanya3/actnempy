@@ -72,17 +72,19 @@ class TestActNem(unittest.TestCase):
     def test_vcorr(self):
         print('test_vcorr')
         
-        vcorr = self.an.velocity_autocorr() # expect: Velocity autocorrelation time: 39 frames, 39.0 seconds.
+        vcorr, tc = self.an.velocity_autocorr()
 
         data = np.load(test_dir / "vcorr.npz")
+        self.assertIsNone(assert_allclose(tc, 39.0))
         self.assertIsNone(assert_allclose(vcorr, data["vcorr"]))
 
     def test_ocorr(self):
         print('test_ocorr')
 
-        ocorr = self.an.orientation_autocorr() # expect: Orientation autocorrelation time: 34 frames, 34.0 seconds.
+        ocorr, tc = self.an.orientation_autocorr()
 
         data = np.load(test_dir / "ocorr.npz")
+        self.assertIsNone(assert_allclose(tc, 34.0))
         self.assertIsNone(assert_allclose(ocorr, data["ocorr"]))
     
     def test_find_defects(self):
