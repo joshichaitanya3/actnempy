@@ -37,7 +37,7 @@ def defectpair(X, Y, dist, varphi1, varphi2, rcore=0.1):
     return th.T
 
 
-class TestUtils(unittest.TestCase):
+class TestDefectFinder(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

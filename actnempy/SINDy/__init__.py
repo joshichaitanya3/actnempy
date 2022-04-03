@@ -2,6 +2,9 @@
 from .anise import Anise
 from .benchmark import Benchmark
 from .pde import PDE
+from .pde import HRidge
+from .pde import kfold_cv
+from .pde import print_pde
 
 from .library_tools import Function
 from .library_tools import MultiplyOp
