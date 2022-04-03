@@ -5,9 +5,6 @@ from .misc import add_noise
 from .misc import compute_Q
 from .misc import compute_n
 from .misc import remove_NaNs
-from .misc import _circular_shifts
-from .misc import set_boundary
-from .misc import set_boundary_region
 from .misc import count_NaNs
 from .misc import get_random_sample
 

@@ -481,65 +481,10 @@ class PDE:
         fig.savefig(f"{filename}.pdf",dpi=300)
         
         plt.show()
-        
+            
     def plot_fvu_kfold(self,nterms=None,var='var',filename=None):
         '''
         plot_fvu_kfold()
-          
-        Generate a plot of FVU (Fraction of Variance Unexplained) vs number of 
-        non-zero terms found using k-fold cross-validation on the HRidge method.
-        
-        Training FVU's are plotted in blue, while test FVU's are plotted in 
-        orange. Models with no variance across the k-folds are indicated with 
-        circles whereas the models with variance are indicated with triangles.
-        
-        Parameters
-        ----------
-        nterms : int, optional
-            Number of terms to truncate the x-axis for the plot. 
-            The default is None, in which case the x-axis will not be truncated
-        var : str, optional
-            Name to include in the filename of the saved plot. 
-            The default is 'var'.
-        filename : str, optional
-            Full path to the filename of the saved plot. 
-            The default is None, in which case it will be saved as 
-            f'fvu_{var}_nterms_{nterms}_cv' in the PDE's data_dir
-
-        Returns
-        -------
-        None.
-
-        '''
-        if nterms is None:
-            nterms = self.nt
-        if var is None:
-            var = 'var'
-        [fig_width, fig_height] = plt.rcParams["figure.figsize"]
-        # Generate figure for full column
-        fig = plt.figure(figsize=(2*fig_width, fig_height))
-        zv = self.variance==0 # ids with zero variance
-        p1 = plt.errorbar(self.n_terms[zv],self.fvu_mean[zv],yerr=self.fvu_err[:,zv],fmt='o',color='tab:orange')
-        p2 = plt.errorbar(self.n_terms[~zv],self.fvu_mean[~zv],yerr=self.fvu_err[:,~zv],fmt='^',color='tab:orange')
-        p3 = plt.errorbar(self.n_terms[zv],self.fvut_mean[zv],yerr=self.fvut_err[:,zv],fmt='o',color='tab:blue')
-        p4 = plt.errorbar(self.n_terms[~zv],self.fvut_mean[~zv],yerr=self.fvut_err[:,~zv],fmt='^',color='tab:blue')
-        yl,yh = plt.gca().get_ylim()
-        plt.yscale('log')
-        plt.xlabel('Number of non-zero terms')
-        plt.ylabel(r'$1 - R^2$')
-
-        plt.legend([(p1,p2),(p3,p4)],['Train data','Test data'],scatterpoints=2)
-        plt.xlim([0,nterms+0.5])
-        plt.tight_layout()
-        if filename is None:
-            filename = f'{self.metadata["data_dir"]}/fvu_{var}_nterms_{nterms}_cv'
-        fig.savefig(f"{filename}.png",dpi=300)
-        fig.savefig(f"{filename}.pdf",dpi=300)
-        plt.show()
-    
-    def plot_fvu_kfold_paper(self,nterms=None,var='var',filename=None):
-        '''
-        plot_fvu_kfold_paper()
 
         Generate a plot of average FVU (Fraction of Variance
         Unexplained) vs number of non-zero terms found using k-fold
