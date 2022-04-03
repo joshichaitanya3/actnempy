@@ -1,6 +1,6 @@
 # actnempy
 
-Analysis suite for 2D active nematics data.
+Analysis suite for 2D active nematics data, written in Python3.
 
 # Installation
 
@@ -13,6 +13,7 @@ git clone https://github.com/joshichaitanya3/actnempy.git
 2. Install via `pip`
 
 ```
+pip install wheel
 cd actnempy
 pip install .
 ```
