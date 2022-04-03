@@ -254,7 +254,6 @@ def remove_NaNs(field, nematic=False):
             c2th, s2th = np.nanmean(np.cos(2*bdys)), np.nanmean(np.sin(2*bdys))
             field[tuple(pos)] = 0.5*np.arctan2(s2th, c2th)
         else:
-            print(bdys)
             field[tuple(pos)] = np.nanmean(bdys)
 
 def _circular_shifts(iterable):
@@ -268,8 +267,12 @@ def _circular_shifts(iterable):
 
     Usage
     -----
-    >>> circular_shifts(range(4))
-    [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+    for cs in _circular_shifts(range(4)):
+        print(cs)
+    (1, 2, 3, 0)
+    (2, 3, 0, 1)
+    (3, 0, 1, 2)
+    (0, 1, 2, 3)
     """
     iterable = tuple(iterable)
     for _ in range(len(iterable)):

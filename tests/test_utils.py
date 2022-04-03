@@ -45,8 +45,19 @@ class TestUtils(unittest.TestCase):
     def test_compute_Q(self):
         pass
 
-    @skip("This test still needs to be written.")
     def test_compute_n(self):
+        rng = np.random.default_rng(seed=42)
+        S = rng.random((5,5))
+        nx = 1.0 - 2*rng.random((5,5))
+        ny = np.sqrt(1-nx**2)
+        Qxx = S * (nx**2 - 0.5)
+        Qxy = S * nx * ny
+
+        (S0, nx0, ny0) = ut.compute_n(Qxx, Qxy)
+        self.assertIsNone(assert_allclose(S, S0))
+        self.assertIsNone(assert_allclose(nx, nx0))
+        self.assertIsNone(assert_allclose(ny, ny0))
+        
         pass
 
     def test_remove_NaNs(self):
@@ -75,9 +86,11 @@ class TestUtils(unittest.TestCase):
         # Expect the value to be +- pi/2, since they are equivalent for a nematic field
         self.assertAlmostEqual(abs(x[5,4]), 0.5 * np.pi)
 
-    @skip("This test still needs to be written.")
     def test__circular_shifts(self):
-        pass
+        
+        csexp = [(1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2), (0, 1, 2, 3)]
+        for i,cs in enumerate(ut._circular_shifts(range(4))):
+            self.assertEqual(cs,csexp[i])
 
     @skip("This test still needs to be written.")
     def test_set_boundary(self):
@@ -87,9 +100,11 @@ class TestUtils(unittest.TestCase):
     def test_set_boundary_region(self):
         pass
 
-    @skip("This test still needs to be written.")
     def test_count_NaNs(self):
-        pass
+        a = np.zeros([5,5])
+        a[1,2] = np.nan 
+        a[2,3] = np.nan
+        self.assertEqual(ut.count_NaNs(a),2)
 
     @skip("This test still needs to be written.")
     def test_get_random_sample(self):
