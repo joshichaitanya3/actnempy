@@ -284,7 +284,7 @@ class ActNem:
                 vxp = self.u_all[i,j,:]
                 vyp = self.v_all[i,j,:]
                 corrs[idx, :] = self._autocorr_vector(vxp, vyp)
-        vcorr = np.mean(corrs, axis=0)
+        vcorr = np.nanmean(corrs, axis=0)
         tcorr = np.argmin(vcorr>1/np.exp(1)) # In frames
         tc = self.dt * tcorr
         return vcorr, tc
@@ -314,7 +314,7 @@ class ActNem:
                 Qxyp = self.Qxy_all[i,j,:]
                 corrs[idx, :] = self._autocorr_vector(Qxxp, Qxyp)
 
-        ocorr = np.mean(corrs, axis=0)
+        ocorr = np.nanmean(corrs, axis=0)
         tcorr = np.argmin(ocorr>1/np.exp(1)) # In frames
         tc = self.dt * tcorr
         return ocorr, tc
