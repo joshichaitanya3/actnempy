@@ -596,7 +596,28 @@ class PDE:
         print(f"R2 score: {self.r2[self.idx]}")
         print(f"Contains {np.count_nonzero(self.beta)}/{len(self.beta)} terms...")
         print_pde(self.beta, self.desc, self.ut)
+    
+    def hierarchy(self):
+        '''
+        terms = hierarchy()
 
+        Returns a list of terms in the order in which they first appear
+        in the model heirarchy. For instance, terms[0] will contain the
+        term at n=1, term[1] will contain the term at n=2 that is not
+        present at n=1, and so on.
+        '''
+        terms = []
+        self.nt = len(self.desc)
+        for n in range(1, self.nt+1):
+            idx = -n
+            beta = self.w_all[idx]
+            loc = np.argwhere(beta!=0).flatten()
+            for id in loc:
+                term = self.desc[id]
+                if term not in terms:
+                    terms.append(term)
+        
+        return terms
 
 if __name__ == "__main__":
     pass
