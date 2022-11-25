@@ -6,11 +6,11 @@ import warnings
 class Grid:
 
     def __init__(self,ndims=2,h=None,boundary='periodic'):
-        self.ndims = ndims
-        self.h = self.__validate_grid(h,ndims)
+        self._ndims = ndims
+        self._h = self._validate_grid(h,ndims)
         self.boundary = boundary
 
-    def __validate_grid(self,h,ndims):
+    def _validate_grid(self,h,ndims):
         # check assumptions on h
         if h is None:
             h = np.ones(ndims)
@@ -34,11 +34,11 @@ class Grid:
 
         return h
 
-    def set_ndims(self,ndims):
-        self.ndims = ndims
+    def ndims(self):
+        return self._ndims
 
-    def set_h(self,h):
-        self.h = self.__validate_grid(h,self.ndims)
+    def h(self):
+        return self._h
 
     def set_periodic_bc(self):
         self.boundary = "periodic"
@@ -120,11 +120,11 @@ class Grid:
         
         f = np.asanyarray(f)
         if ndims is None:
-            ndims = self.ndims
+            ndims = self._ndims
         if h is None:
-            h = self.h
+            h = self._h
         else:
-            h = self.__validate_grid(h, ndims)
+            h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
         
@@ -171,7 +171,7 @@ class Grid:
         div : ndarray
             Divergence of tensor field `f`. 
             If `f` is indexed f[i][j][k]... , then 
-            divf[j][k]... = sum(\partial_i (f[i][j][k]...), 
+            divf[j][k]... = sum(\\partial_i (f[i][j][k]...), 
             i going from 0 to (ndims-1)
 
         Raises
@@ -184,11 +184,11 @@ class Grid:
         """
         f = np.asanyarray(f)
         if ndims is None:
-            ndims = self.ndims
+            ndims = self._ndims
         if h is None:
-            h = self.h
+            h = self._h
         else:
-            h = self.__validate_grid(h, ndims)
+            h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
 
@@ -244,7 +244,7 @@ class Grid:
         -------
         out : ndarray
             Curl of tensor field `f`. If `f` is indexed f[i][j][k]... ,
-            the curl[i][j][k]... = sum(levi[i,l,m]\partial_l (f[m][j][k]...), 
+            the curl[i][j][k]... = sum(levi[i,l,m]\\partial_l (f[m][j][k]...), 
             {l,m} going from 0 to (ndims-1)
 
         Raises
@@ -264,11 +264,11 @@ class Grid:
         
         f = np.asanyarray(f)
         if ndims is None:
-            ndims = self.ndims
+            ndims = self._ndims
         if h is None:
-            h = self.h
+            h = self._h
         else:
-            h = self.__validate_grid(h, ndims)
+            h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
 
@@ -370,7 +370,7 @@ class Grid:
             Laplacian of tensor field `f`. If `f` is indexed
             f[i][j][k]... ,
             then
-            lapf[i][j][k]... = sum(\partial_l \partial_l (f[i][j][k]...), 
+            lapf[i][j][k]... = sum(\\partial_l \\partial_l (f[i][j][k]...), 
             l going from 0 to (ndims-1)
 
         Raises
@@ -381,11 +381,11 @@ class Grid:
         
         f = np.asanyarray(f)
         if ndims is None:
-            ndims = self.ndims
+            ndims = self._ndims
         if h is None:
-            h = self.h
+            h = self._h
         else:
-            h = self.__validate_grid(h, ndims)
+            h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
         
