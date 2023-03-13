@@ -20,12 +20,6 @@ from tqdm import tqdm
 from scipy.signal import correlate
 import sys
 from pathlib import Path
-### Matplotlib settings for PRX / PRL figures
-
-here = Path(__file__).parent
-
-style_file = (here / "prx.mplstyle").resolve()
-plt.style.use(str(style_file))
 
 class ActNem:
     '''
