@@ -6,11 +6,6 @@ from .anise import Anise
 from .pde import PDE 
 from pathlib import Path
 
-parent = Path(__file__).parent.parent
-
-style_file = (parent / "prx.mplstyle").resolve()
-plt.style.use(str(style_file))
-
 class Benchmark(Anise):
 
     def add_noise_all(self, noise_strength=0.01, seed=None):

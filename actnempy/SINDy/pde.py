@@ -21,15 +21,6 @@ from ..utils.grid import Grid
 from pathlib import Path
 from sklearn.metrics import r2_score
 
-### Matplotlib settings for PRX / PRL figures
-parent = Path(__file__).parent.parent
-
-style_file = (parent / "prx.mplstyle").resolve()
-plt.style.use(str(style_file))
-
-
-###
-
 def HRidge(X0, y, lam, normalize = 2):
     """
     (w_all, r2) = HRidge(X0, y, lam, normalize = 2)
