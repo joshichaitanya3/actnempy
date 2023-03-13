@@ -2,6 +2,8 @@
 
 Analysis suite for 2D active nematics data, written in Python3.
 
+This code has benefited from crucial contributions from Matthew S. E. Peterson ([@mattsep](https://github.com/mattsep)) and Michael M. Norton ([@wearefor](https://github.com/wearefor)).
+
 For an example of a code used in the manuscript [Data-driven discovery of active nematic hydrodynamics](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.258001) ([arXiv version here](https://arxiv.org/abs/2202.12854)), see [this Jupyter notebook.](examples/SINDy.ipynb)
 
 # Installation
