@@ -24,11 +24,6 @@ from tqdm import tqdm
 from pathlib import Path
 from scipy.signal import correlate
 from ..actnem import ActNem
-### Matplotlib settings for PRX / PRL figures
-parent = Path(__file__).parent.parent
-
-style_file = (parent / "prx.mplstyle").resolve()
-plt.style.use(str(style_file))
 
 class Anise(ActNem):
     '''
