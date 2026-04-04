@@ -242,10 +242,12 @@ class ActNem:
         return means
 
     def _autocorr_vector(self, vx, vy):
-        '''
-        
+        r'''
+
         Function to compute the autocorrelation in time of a vector.
-        \\expval{ \\vec{v}(t+t') \cdot \\vec{v}(t') }_{t'}
+
+        .. math::
+            $\expval{ \vec{v}(t+t') \cdot \vec{v}(t') }_{t'}$
 
         '''
 

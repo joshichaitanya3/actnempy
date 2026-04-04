@@ -22,6 +22,31 @@ cd actnempy
 pip install .
 ```
 
+# Running Tests
+
+The test suite uses Python's built-in `unittest` framework and can be run with `pytest`.
+
+First install the test dependencies:
+
+```
+pip install pytest gdown
+```
+
+Then run all tests from the repository root:
+
+```
+pytest
+```
+
+To run a specific test file:
+
+```
+pytest tests/test_actnem.py -v
+```
+
+> [!NOTE]
+> `test_actnem.py` downloads a small test dataset (~few MB) from Google Drive on first run via `gdown`. Ensure you have an internet connection, or pre-place the data in `TestData/processed_data.npz`.
+
 # Usage
 
 Basic usage is showcased under [examples/basic_example.ipynb](examples/basic_example.ipynb)

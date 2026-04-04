@@ -15,7 +15,6 @@ import matplotlib.gridspec as gridspec
 # image convolution
 
 from scipy import signal
-from scipy import misc
 
 # -----------------
 # image processing
