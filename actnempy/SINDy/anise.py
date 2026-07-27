@@ -6,15 +6,15 @@ Main module (Anise)
 
 Code by Chaitanya Joshi (chaitanya@brandeis.edu)
 
-The main object of this module is the Class Anise, which is designed to handle model identification for 2D active nematic data of Q-tensor and velocity. 
+The main object of this module is the Class Anise, which is designed to handle model identification for 2D active nematic data of Q-tensor and velocity.
 
 '''
 
 from ..utils import func_defectfind, func_defectpos, func_defectorient, func_plotdefects
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
-import numpy as np 
-import matplotlib.pyplot as plt 
+import numpy as np
+import matplotlib.pyplot as plt
 import json
 from ..utils import Grid, nematic_plot, add_noise, compute_n, get_random_sample
 from .library_tools import Function, build_base_expr, build_constrained_library_array, get_term_val
@@ -27,9 +27,9 @@ from ..actnem import ActNem
 
 class Anise(ActNem):
     '''
-    
-    This class is designed to handle model identification for 2D active nematic data of Q-tensor and velocity. 
-    
+
+    This class is designed to handle model identification for 2D active nematic data of Q-tensor and velocity.
+
     Attributes
     ----------
 
@@ -39,7 +39,7 @@ class Anise(ActNem):
             `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`, `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial dimensions and T being the time dimension. The preprocessing of the experimental / simulation data into this format is done elsewhere.
 
             `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying the spatial and temoral discretization of the data.
-    
+
     visual_check : bool
         An optional flag to plot the first five frames of the data as a visual check.
 
@@ -64,9 +64,9 @@ class Anise(ActNem):
                 self.Qxy_all = data['Qxy_all']
 
             # Check that the dimensions match
-            vals = [self.u_all.shape, 
-                    self.v_all.shape, 
-                    self.Qxx_all.shape, 
+            vals = [self.u_all.shape,
+                    self.v_all.shape,
+                    self.Qxx_all.shape,
                     self.Qxy_all.shape]
 
             if not all(v==self.u_all.shape for v in vals):
@@ -78,19 +78,19 @@ class Anise(ActNem):
         else:
             msg = f"Couldn't find the data at {self.processed_data_file}!"
             raise ValueError(msg)
-        
+
         # Import metadata
 
         with open(f'{data_dir}/sindy_library_specs.json', 'r') as f:
             self.metadata = json.load(f)
-        
+
         with open(f'{data_dir}/metadata.json', 'r') as f:
 
             self.metadata.update(json.load(f))
             self.dx = self.metadata['dx']
             self.dy = self.metadata['dy']
             self.dt = self.metadata['dt']
-        
+
         self.metadata["data_dir"] = self.data_dir
 
         (self.NX, self.NY, self.NT) = self.u_all.shape
@@ -99,11 +99,11 @@ class Anise(ActNem):
         self.X, self.Y = np.meshgrid(self.x, self.y, indexing='ij')
 
         self.grid2D = Grid(h=(self.dx,self.dy),boundary="regular",ndims=2)
-        
+
         if visual_check: # Visualize the first 5 frames as a check
             print("Visualizing the first 5 frames...")
-            self.visualize(5) 
-        
+            self.visualize(5)
+
         if run:
             self.sindy_int()
 
@@ -113,21 +113,21 @@ class Anise(ActNem):
         '''
         (lib_lhs,lib_Q,lib_Stokes,lib_overdamped) = generate_libraries_int()
 
-        Function to generate SINDy libraries for the Q-tensor and the flow equation. 
+        Function to generate SINDy libraries for the Q-tensor and the flow equation.
 
         Returns
         -------
 
         lib_lhs : dtype=[('name','U50'),('val','complex128' (num_windows,))]
             Array containing the terms on the left hand side.
-        
-        lib_Q : dtype=[('name','U50'),('val','complex128', (num_windows,))] 
+
+        lib_Q : dtype=[('name','U50'),('val','complex128', (num_windows,))]
             Array containing the terms on the RHS of the Q-tensor equations
-        
-        lib_Stokes : dtype=[('name','U50'),('val','complex128', (num_windows,))] 
+
+        lib_Stokes : dtype=[('name','U50'),('val','complex128', (num_windows,))]
             Array containing the terms on the RHS of the Stokes equation
 
-        lib_overdamped : dtype=[('name','U50'),('val','complex128', (num_windows,))] 
+        lib_overdamped : dtype=[('name','U50'),('val','complex128', (num_windows,))]
             Array containing the terms on the RHS of the overdamped flow equation
 
         '''
@@ -135,11 +135,11 @@ class Anise(ActNem):
         num_windows = self.metadata['num_windows']
         window_size = self.metadata['window_size']
 
-        
+
         ## Generate the Function objects and base expressions
 
         ##### Q tensor ########
-        #  
+        #
         coords = ['x','y']
 
         mQ = self.metadata["Q tensor"]
@@ -150,12 +150,12 @@ class Anise(ActNem):
         QxyfQ = Function('Qxy',**mQ['Qxy'])
 
         funcsQ = [ufQ,vfQ,QxxfQ,QxyfQ]
-        
+
         constraints_Q = mQ['constraints']
 
         base_Q = build_base_expr(funcsQ,coords,constraints_Q)
 
-        # Remove terms containing (∂v/∂y) as they are proportional to 
+        # Remove terms containing (∂v/∂y) as they are proportional to
         # (∂u/∂x) due to incompressibility.
 
         base_Q = [item for item in base_Q if item.__repr__()!='(∂v/∂y)']
@@ -173,13 +173,13 @@ class Anise(ActNem):
         vSt = Function('Qxy',**mSt["v"])
 
         constraints_Stokes = mSt["constraints"]
-        
+
         funcsStokes = [uSt, vSt, wSt, QxxSt,QxySt]
 
         base_Stokes = build_base_expr(funcsStokes,
                                         coords,
                                         constraints_Stokes)
-        
+
         ####### Over-damped #########
         if overdamped:
             mOd = self.metadata["Overdamped"]
@@ -188,16 +188,16 @@ class Anise(ActNem):
             QxyOd = Function('Qxy',**mOd["Qxy"])
 
             constraints_Od = mOd["constraints"]
-            
+
             funcsOd = [QxxOd,QxyOd]
 
             base_Od = build_base_expr(funcsOd,
                                         coords,
                                         constraints_Od)
-            
+
 
         arr_type = 'complex128'
-        
+
         pts_per_window = window_size**3
         num_points = num_windows * pts_per_window
 
@@ -287,7 +287,7 @@ class Anise(ActNem):
         QXYxxyy = np.zeros((num_windows,1))
         QXYxyyy = np.zeros((num_windows,1))
         QXYyyyy = np.zeros((num_windows,1))
-        
+
         # Initialize the library arrays in which we would later store the
         # regionwise averaged values one by one.
 
@@ -333,7 +333,7 @@ class Anise(ActNem):
         )
 
         db_Stokes = np.array(
-            [   
+            [
                 ('u',U.flatten()),
                 ('v',V.flatten()),
                 ('ω',W.flatten()),
@@ -373,7 +373,7 @@ class Anise(ActNem):
             ],
             dtype=[('name','U50'),('val',arr_type,U.flatten().shape)]
         )
-                
+
         if overdamped:
             db_overdamped = np.array(
                 [
@@ -414,7 +414,7 @@ class Anise(ActNem):
                                                         db_Stokes,
                                                         coords,
                                                         constraints_Stokes)
-            
+
         # Add time derivative term to the Stokes library
         dw_dt = get_term_val(lib_lhs,'(∂ω/∂t)')
         # Append ω to the Stokes library
@@ -516,7 +516,7 @@ class Anise(ActNem):
         QXYxxyy = np.zeros((pts_per_window,1))
         QXYxyyy = np.zeros((pts_per_window,1))
         QXYyyyy = np.zeros((pts_per_window,1))
-        
+
         dx = self.metadata["dx"]
         dy = self.metadata["dy"]
         dt = self.metadata["dt"]
@@ -535,7 +535,7 @@ class Anise(ActNem):
         print('Computing derivatives at selected points...')
 
         for key, view in views.items():
-            
+
             chunk = (..., 0)
             u_view = self.u_all[view].copy()
             v_view = self.v_all[view].copy()
@@ -578,79 +578,79 @@ class Anise(ActNem):
 
             U[chunk] = u_view[inner_view].flatten()
             V[chunk] = v_view[inner_view].flatten()
-            
+
             QXX[chunk] = Qxx_view[inner_view].flatten()
             QXY[chunk] = Qxy_view[inner_view].flatten()
-            
+
             Ut[chunk] = Ut_view[inner_view].flatten()
             Vt[chunk] = Vt_view[inner_view].flatten()
-            
+
             QXXt[chunk] = QXXt_view[inner_view].flatten()
             QXYt[chunk] = QXYt_view[inner_view].flatten()
-            
+
             Ux[chunk] = Ux_view[inner_view].flatten()
             Uy[chunk] = Uy_view[inner_view].flatten()
-            
+
             Uxx[chunk] = Uxx_view[inner_view].flatten()
             Uxy[chunk] = Uxy_view[inner_view].flatten()
             Uyy[chunk] = Uyy_view[inner_view].flatten()
-            
+
             Vx[chunk] = Vx_view[inner_view].flatten()
             Vxx[chunk] = Vxx_view[inner_view].flatten()
-            
+
             W[chunk] = W_view[inner_view].flatten()
-            
+
             Wt[chunk] = Wt_view[inner_view].flatten()
-            
+
             Wx[chunk] = Wx_view[inner_view].flatten()
             Wy[chunk] = Wy_view[inner_view].flatten()
-            
+
             Wxx[chunk] = Wxx_view[inner_view].flatten()
             Wxy[chunk] = Wxy_view[inner_view].flatten()
             Wyy[chunk] = Wyy_view[inner_view].flatten()
-            
+
             QXXx[chunk] = QXXx_view[inner_view].flatten()
             QXXy[chunk] = QXXy_view[inner_view].flatten()
-            
+
             QXXxx[chunk] = QXXxx_view[inner_view].flatten()
             QXXxy[chunk] = QXXxy_view[inner_view].flatten()
             QXXyy[chunk] = QXXyy_view[inner_view].flatten()
-            
+
             QXXxxx[chunk] = QXXxxx_view[inner_view].flatten()
             QXXxxy[chunk] = QXXxxy_view[inner_view].flatten()
             QXXxyy[chunk] = QXXxyy_view[inner_view].flatten()
             QXXyyy[chunk] = QXXyyy_view[inner_view].flatten()
-            
-            
+
+
             # QXXxxx[p] = Qxx_x_diff[2]
             # QXXxxy[p] = (Qxx_x_diff_yp[1]-Qxx_x_diff_ym[1])/(2*dy)
             # QXXxyy[p] = (Qxx_y_diff_xp[1]-Qxx_y_diff_xm[1])/(2*dx)
             # QXXyyy[p] = Qxx_y_diff[2]
-            
+
             # QXXxxxx[p] = Qxx_x_diff[3]
             # QXXxxxy[p] = (Qxx_x_diff_yp[2]-Qxx_x_diff_ym[2])/(2*dy)
             # QXXxxyy[p] = (Qxx_x_diff_yp[1]+Qxx_x_diff_ym[1]-2*Qxx_x_diff[1])/(dy**2)
             # QXXxyyy[p] = (Qxx_y_diff_xp[2]-Qxx_y_diff_xm[2])/(2*dx)
             # QXXyyyy[p] = Qxx_y_diff[3]
-            
+
             QXYx[chunk] = QXYx_view[inner_view].flatten()
             QXYy[chunk] = QXYy_view[inner_view].flatten()
-            
+
             QXYxx[chunk] = QXYxx_view[inner_view].flatten()
             QXYxy[chunk] = QXYxy_view[inner_view].flatten()
             QXYyy[chunk] = QXYyy_view[inner_view].flatten()
-            
+
             QXYxxx[chunk] = QXYxxx_view[inner_view].flatten()
             QXYxxy[chunk] = QXYxxy_view[inner_view].flatten()
             QXYxyy[chunk] = QXYxyy_view[inner_view].flatten()
             QXYyyy[chunk] = QXYyyy_view[inner_view].flatten()
-            
-            
+
+
             # QXYxxx[p] = Qxy_x_diff[2]
             # QXYxxy[p] = (Qxy_x_diff_yp[1]-Qxy_x_diff_ym[1])/(2*dy)
             # QXYxyy[p] = (Qxy_y_diff_xp[1]-Qxy_y_diff_xm[1])/(2*dx)
             # QXYyyy[p] = Qxy_y_diff[2]
-            
+
             # QXYxxxx[p] = Qxy_x_diff[3]
             # QXYxxxy[p] = (Qxy_x_diff_yp[2]-Qxy_x_diff_ym[2])/(2*dy)
             # QXYxxyy[p] = (Qxy_x_diff_yp[1]+Qxy_x_diff_ym[1]-2*Qxy_x_diff[1])/(dy**2)
@@ -740,7 +740,7 @@ class Anise(ActNem):
                 ],
                 dtype=[('name','U50'),('val',arr_type,U.flatten().shape)]
             )
-                    
+
             if overdamped:
                 db_overdamped_p = np.array(
                     [
@@ -781,7 +781,7 @@ class Anise(ActNem):
                                                         db_Stokes_p,
                                                         coords,
                                                         constraints_Stokes)
-                
+
             # Add time derivative term to the Stokes library
             dw_dt_p = get_term_val(lib_lhs_p,'(∂ω/∂t)')
             # Append ω to the Stokes library
@@ -795,24 +795,24 @@ class Anise(ActNem):
                                                             db_overdamped_p,
                                                             coords,
                                                             constraints_Od)
-            
+
             for i in range(len(lib_lhs)):
                 lib_lhs[i]['val'][key] = np.mean(lib_lhs_p[i]['val'])
-            
+
             for i in range(len(lib_Q)):
                 lib_Q[i]['val'][key] = np.mean(lib_Q_p[i]['val'])
-            
+
             for i in range(len(lib_Stokes)):
                 lib_Stokes[i]['val'][key] = np.mean(lib_Stokes_p[i]['val'])
-            
+
             if overdamped:
                 for i in range(len(lib_overdamped)):
                     lib_overdamped[i]['val'][key] = np.mean(lib_overdamped_p[i]['val'])
-        
+
         if not overdamped:
             lib_overdamped = None
         return (lib_lhs,lib_Q,lib_Stokes,lib_overdamped)
-        
+
     def weak_form_flow_libs(self,
                             num_windows,
                             window_size,
@@ -834,23 +834,23 @@ class Anise(ActNem):
 
         num_windows : int
             Number of integration windows to select randomly
-        
+
         window_size : tuple
-            Tuple containing 3 integers (NX, NY, NT), specifying the dimensions of the integration windows in x, y and t. 
-        
+            Tuple containing 3 integers (NX, NY, NT), specifying the dimensions of the integration windows in x, y and t.
+
         sample : int
             Sample number to pick. Default is 1.
-        
+
         p : int
             Exponent of (x**2-1) and (y**2-1) in the test function. Default is 6.
-        
+
         r : int
-            
+
 
         Returns
         -------
 
-        
+
         '''
 
         # sample = self.metadata['sample']
@@ -858,7 +858,7 @@ class Anise(ActNem):
         # window_size = self.metadata['window_size']
         (wx, wy, wt) = window_size
 
-        dx = self.dx * wx / 2 
+        dx = self.dx * wx / 2
         dy = self.dy * wy / 2
         dt = self.dt * wt / 2
 
@@ -876,7 +876,7 @@ class Anise(ActNem):
         dt_U_int = np.zeros(num_windows)
         U_dot_grad_U_int = np.zeros(num_windows)
         U_divU_int = np.zeros(num_windows)
-            
+
         Q_dot_U_int = np.zeros(num_windows)
         TrQ2_U_int = np.zeros(num_windows)
 
@@ -885,40 +885,40 @@ class Anise(ActNem):
         nb = int(np.ceil(diff_order/2.0))
         inner_view = (slice(nb, -nb), slice(nb, -nb), slice(nb, -nb))
         _, views, = get_random_sample(
-            self.size, num_windows, window_size, diff_order, sample)  
+            self.size, num_windows, window_size, diff_order, sample)
         psi = TestFunction(p, p, r, window_size, dx=dx, dy=dy, dt=dt)
         dx_psi = psi.grad(1, 0, 0)
         dy_psi = psi.grad(0, 1, 0)
-        
+
         dx2_psi = psi.grad(2, 0, 0)
         dy2_psi = psi.grad(0, 2, 0)
         dx_dy_psi = psi.grad(1, 1, 0)
         dy_dt_psi = psi.grad(0, 1, 1)
         dx_dt_psi = psi.grad(1, 0, 1)
-        
+
 
         dy_grad_sq_psi = psi.grad(2, 1, 0) + psi.grad(0, 3, 0)
         dx_grad_sq_psi = psi.grad(3, 0, 0) + psi.grad(1, 2, 0)
-        
+
         dy_grad_4_psi = psi.grad(4, 1, 0) + psi.grad(2, 3, 0) + psi.grad(0, 5, 0)
         dx_grad_4_psi = psi.grad(5, 0, 0) + psi.grad(3, 2, 0) + psi.grad(1, 4, 0)
-        
+
 
         for key, view in tqdm(views.items()):
-            
+
             u_view = self.u_all[view]
             v_view = self.v_all[view]
             Qxx_view = self.Qxx_all[view]
             Qxy_view = self.Qxy_all[view]
-            
-            u = u_view[inner_view] 
+
+            u = u_view[inner_view]
             v = v_view[inner_view]
             Qxx = Qxx_view[inner_view]
             Qxy = Qxy_view[inner_view]
 
             (QXXx_view, QXXy_view, QXXt_view) = grid3D.grad(Qxx_view)
             (QXYx_view, QXYy_view, QXYt_view) = grid3D.grad(Qxy_view)
-            
+
             (ux_view, uy_view, ut_view) = grid3D.grad(u_view)
             (vx_view, vy_view, vt_view) = grid3D.grad(v_view)
 
@@ -935,20 +935,20 @@ class Anise(ActNem):
             dy_v = vy_view[inner_view]
 
             dt_U_int[key] = - np.mean(u * dy_dt_psi - v * dx_dt_psi)
-            
+
             # U_dot_grad_U_int[key] = np.mean(u * v * (dy2_psi - dx2_psi) + (u**2 - v**2) * dx_dy_psi )
 
             U_dot_grad_U_int[key] = np.mean( (u*dx_u+v*dy_u) * dy_psi - (u*dx_v+v*dy_v) * dx_psi )
-            
+
             div_u = dx_u + dy_v
             U_divU_int[key] = np.mean( (u*div_u) * dy_psi - (v*div_u) * dx_psi )
-            
+
             grad_sq_U_int[key] = np.mean(u * dy_grad_sq_psi - v * dx_grad_sq_psi)
-            
+
             grad_4_U_int[key] = np.mean(u * dy_grad_4_psi - v * dx_grad_4_psi)
-            
+
             div_Q_int[key] = np.mean(Qxy * (dx2_psi - dy2_psi) - 2 * Qxx * dx_dy_psi)
-            
+
             divQx = dx_Qxx + dy_Qxy
             divQy = dx_Qxy - dy_Qxx
 
@@ -960,7 +960,7 @@ class Anise(ActNem):
             U_int[key] = np.mean(u * dy_psi - v * dx_psi)
 
             Q_dot_U_int[key] = np.mean( (Qxx*u+Qxy*v) * dy_psi - (Qxy*u-Qxx*v) * dx_psi)
-        
+
             TrQ2_U_int[key] = np.mean( 2 * (Qxx**2 + Qxy**2) * (u * dy_psi - v * dx_psi) )
 
         lib_St = np.array(
@@ -977,8 +977,8 @@ class Anise(ActNem):
             ],
             dtype=[('name', 'U50'), ('val', 'float', U_int.shape)]
         )
-        
-        
+
+
         lib_lhs = np.array(
             [
                 ('∇²u', grad_sq_U_int)
@@ -1001,10 +1001,10 @@ class Anise(ActNem):
         # window_size = self.metadata['window_size']
         (wx, wy, wt) = window_size
 
-        dx = self.dx * wx / 2 
+        dx = self.dx * wx / 2
         dy = self.dy * wy / 2
         dt = self.dt * wt / 2
-        
+
         dx_grid = self.dx
         dy_grid = self.dy
         dt_grid = self.dt
@@ -1019,7 +1019,7 @@ class Anise(ActNem):
         Q_int = np.zeros(num_windows)
         trQ2_Q_int = np.zeros(num_windows)
         grad_sq_Q_int = np.zeros(num_windows)
-        
+
         diff_order = 1
 
         nb = int(np.ceil(diff_order/2.0))
@@ -1027,22 +1027,22 @@ class Anise(ActNem):
 
         _, views, = get_random_sample(
             self.size, num_windows, window_size, diff_order, sample)
-        
+
         Rxxf = TestRxx(p, p, 1, window_size, dx=dx, dy=dy, dt=dt)
         Rxyf = TestRxy(p, p, 1, window_size, dx=dx, dy=dy, dt=dt)
-        
+
         Rxx = Rxxf.arr()
         Rxy = Rxyf.arr()
 
         dx_Rxx = Rxxf.grad(1, 0, 0)
         dx_Rxy = Rxyf.grad(1, 0, 0)
-        
+
         dy_Rxx = Rxxf.grad(0, 1, 0)
         dy_Rxy = Rxyf.grad(0, 1, 0)
-        
+
         dt_Rxx = Rxxf.grad(0, 0, 1)
         dt_Rxy = Rxyf.grad(0, 0, 1)
-        
+
         dx2_Rxx = Rxxf.grad(2, 0, 0)
         dy2_Rxx = Rxxf.grad(0, 2, 0)
         dx_dy_Rxx = Rxxf.grad(1, 1, 0)
@@ -1081,20 +1081,20 @@ class Anise(ActNem):
 
             dx_nu = (dx_Rxx * Qxy + Rxx * dx_Qxy) - (dx_Rxy * Qxx + Rxy * dx_Qxx)
             dy_nu = (dy_Rxx * Qxy + Rxx * dy_Qxy) - (dy_Rxy * Qxx + Rxy * dy_Qxx)
-            
-            
+
+
             dt_Q_int[key] = -2 * np.mean(Qxx * dt_Rxx + Qxy * dt_Rxy)
-            
+
             U_dot_grad_Q_int[key] = -2 * np.mean( Qxx * (u*dx_Rxx + v*dy_Rxx) + Qxy * (u*dx_Rxy + v*dy_Rxy) )
 
             vort_int[key] = 2.0 * np.mean( u * dy_nu - v * dx_nu )
-            
+
             shear_int[key] = - np.mean( u * dx_Rxx + v * dx_Rxy + u * dy_Rxy - v * dy_Rxx )
 
             Q_int[key] = 2 * np.mean( Qxx * Rxx + Qxy * Rxy )
 
             trQ2_Q_int[key] = 2 * np.mean( 2 * (Qxx**2 + Qxy**2) * (Qxx * Rxx + Qxy * Rxy) )
-            
+
             grad_sq_Q_int[key] = 2 * np.mean( Qxx * (dx2_Rxx + dy2_Rxx) + Qxy * (dx2_Rxy + dy2_Rxy) )
 
         Dt_Q_int = dt_Q_int + U_dot_grad_Q_int + vort_int
@@ -1110,9 +1110,9 @@ class Anise(ActNem):
             ],
             dtype=[('name', 'U50'), ('val', 'float', U_dot_grad_Q_int.shape)]
         )
-        
+
         lib_DQ = np.array(
-            [   
+            [
                 ('E', shear_int),
                 ('Q', Q_int),
                 ('TrQ² \u00D7 Q', trQ2_Q_int),
@@ -1130,21 +1130,21 @@ class Anise(ActNem):
         )
 
         return (lib_lhs, lib_Q, lib_DQ)
-    
+
     def sindy_int(self):
-        
+
         print("Generating libraries...")
         (lib_lhs,lib_Q,lib_flow,_) = self.generate_libraries_int()
         print("Computing the PDE for Qxx...")
         self.pde_Qxx = PDE()
         self.pde_Qxx.compute(lib_Q, lib_lhs, '(∂Qxx/∂t)', self.metadata)
         print("Done! Stored under pde_Qxx.\n")
-        
+
         print("Computing the PDE for Qxy...")
         self.pde_Qxy = PDE()
         self.pde_Qxy.compute(lib_Q, lib_lhs, '(∂Qxy/∂t)', self.metadata)
         print("Done! Stored under pde_Qxy.\n")
-        
+
         print("Computing the PDE for the flow...")
         self.pde_St = PDE()
         self.pde_St.compute(lib_flow, lib_lhs, '∇²ω', self.metadata)
@@ -1152,7 +1152,7 @@ class Anise(ActNem):
 
         print("All done!")
 
-    def weak_form(self, 
+    def weak_form(self,
                   num_windows,
                   window_size,
                   sample=1,
@@ -1171,7 +1171,7 @@ class Anise(ActNem):
 
         print("Done! Stored under pde_St_w.\n")
 
-    def weak_form_Q(self, 
+    def weak_form_Q(self,
                     num_windows,
                     window_size,
                     sample=1,

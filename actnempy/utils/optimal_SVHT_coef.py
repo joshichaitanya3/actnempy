@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import scipy.integrate as integrate
 
 def optimal_SVHT_coef(beta, sigma_known):
@@ -8,17 +8,17 @@ def optimal_SVHT_coef(beta, sigma_known):
 
     Coefficient determining optimal location of Hard Threshold for Matrix
     Denoising by Singular Values Hard Thresholding when noise level is known or
-    unknown.  
+    unknown.
 
     See D. L. Donoho and M. Gavish, "The Optimal Hard Threshold for Singular
     Values is 4/sqrt(3)", http://arxiv.org/abs/1305.5870
 
     Parameters
-    ---------- 
+    ----------
 
-    beta : float 
-        aspect ratio m/n of the matrix to be denoised, 0<beta<=1. 
-        beta may be a vector 
+    beta : float
+        aspect ratio m/n of the matrix to be denoised, 0<beta<=1.
+        beta may be a vector
     sigma_known: bool
         1 if noise level known, 0 if unknown
 
@@ -27,8 +27,8 @@ def optimal_SVHT_coef(beta, sigma_known):
 
     coef : int
         optimal location of hard threshold, up the median data singular
-        value (sigma unknown) or up to sigma*sqrt(n) (sigma known) 
-        a vector of the same dimension as beta, where coef(i) is the 
+        value (sigma unknown) or up to sigma*sqrt(n) (sigma known)
+        a vector of the same dimension as beta, where coef(i) is the
         coefficient correcponding to beta(i)
 
     Examples
@@ -36,7 +36,7 @@ def optimal_SVHT_coef(beta, sigma_known):
 
     Usage in known noise level:
 
-    Given an m-by-n matrix Y known to be low rank and observed in white noise 
+    Given an m-by-n matrix Y known to be low rank and observed in white noise
     with mean zero and known variance sigma^2, form a denoised matrix Xhat by:
 
     >>>U,s,V = np.linalg.svd(Y, full_matrices = False)
@@ -48,12 +48,12 @@ def optimal_SVHT_coef(beta, sigma_known):
     Usage in unknown noise level:
 
     Given an m-by-n matrix Y known to be low rank and observed in white
-    noise with mean zero and unknown variance, form a denoised matrix 
+    noise with mean zero and unknown variance, form a denoised matrix
     Xhat by:
 
     >>>U,s,V = np.linalg.svd(Y, full_matrices = False)
     >>>(n,m) = Y.shape
-    >>>s[ s < (optimal_SVHT_coef(m/n,0) * np.median(s)) ] = 0 
+    >>>s[ s < (optimal_SVHT_coef(m/n,0) * np.median(s)) ] = 0
     >>>Xhat = ( U.dot( np.diag(s).dot(V) ) )
     -----------------------------------------------------------------------------
     Authors: Matan Gavish and David Donoho <lastname>@stanford.edu, 2013
@@ -76,7 +76,7 @@ def optimal_SVHT_coef(beta, sigma_known):
         return optimal_SVHT_coef_sigma_known(beta)
     else:
         return optimal_SVHT_coef_sigma_unknown(beta)
-    
+
 
 def optimal_SVHT_coef_sigma_known(beta):
 
@@ -84,12 +84,12 @@ def optimal_SVHT_coef_sigma_known(beta):
 
     assert((beta > 0.0).all())
     assert((beta <= 1.0).all())
-    
+
     assert( np.prod(beta.shape) == max(beta.shape) ) #  beta must be a vector
-    
+
     beta = beta.flatten()
 
-    w = (8 * beta) / (beta + 1 + np.sqrt(beta**2 + 14 * beta +1)) 
+    w = (8 * beta) / (beta + 1 + np.sqrt(beta**2 + 14 * beta +1))
     return np.sqrt(2 * (beta + 1) + w)
 
 def optimal_SVHT_coef_sigma_unknown(beta):
@@ -99,16 +99,16 @@ def optimal_SVHT_coef_sigma_unknown(beta):
 
     assert((beta > 0.0).all())
     assert((beta <= 1.0).all())
-    
+
     if beta.shape != (): # If beta is not a float
         assert( np.prod(beta.shape) == max(beta.shape) ) #  beta must be a vector
-    
+
     beta = beta.flatten()
-    
+
     coef = optimal_SVHT_coef_sigma_known(beta)
-    
+
     mp_median = [median_marcenko_pastur(beta_i) for beta_i in beta]
-    
+
     return coef / np.sqrt(mp_median)
 
 
@@ -117,10 +117,10 @@ def median_marcenko_pastur(x,beta):
     if (beta <= 0) or (beta > 1) :
         msg = "Invalid value of beta. Beta should lie between 0 and 1"
         raise ValueError(msg)
-    
+
     lower_bound = ( 1 - np.sqrt(beta) )**2
     higher_bound = ( 1 + np.sqrt(beta) )**2
-    
+
     if (x < lower_bound) or (x > higher_bound) :
         msg = "Invalid value of x. " + \
               "x should lie between (1-sqrt(beta))**2 and  (1+sqrt(beta))**2"
@@ -155,7 +155,7 @@ def median_marcenko_pastur(beta):
       if (y > 0.5).any():
          higher_bound = min(x[y > 0.5])
          change = 1
-    
+
     return (higher_bound + lower_bound) / 2
 
 def inc_mar_pas(x0,beta,gamma):
@@ -163,7 +163,7 @@ def inc_mar_pas(x0,beta,gamma):
     if (beta > 1) :
         msg = "Invalid value of beta. Beta should be greater than 1"
         raise ValueError(msg)
-    
+
     top_spec = (1 + np.sqrt(beta))**2
     bot_spec = (1 - np.sqrt(beta))**2
 
@@ -176,7 +176,7 @@ def inc_mar_pas(x0,beta,gamma):
        fun = lambda x : mar_pas(x)
 
     (I, _) = integrate.quad(fun, x0, top_spec)
-    
+
     return I
 
 def if_else(Q,point,counter_point):
@@ -194,4 +194,3 @@ def if_else(Q,point,counter_point):
 
     return y
 
-    

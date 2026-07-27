@@ -36,20 +36,20 @@ class TestGrid(unittest.TestCase):
     # @skip("This test still needs to be written.")
     # def test_skipdemo(self):
     #     pass
-    
+
     def test__validate_grid_incorrectshape(self):
-        
+
         self.assertRaises(ValueError, Grid, 2, (1,1,1))
         self.assertRaises(ValueError, Grid, 2, (1,))
         self.assertRaises(ValueError, Grid, 1, (1,1))
         self.assertRaises(ValueError, Grid, 3, (1,1))
-    
+
     def test__validate_grid_negative_h(self):
 
         self.assertRaises(ValueError, Grid, 2, -1)
         self.assertRaises(ValueError, Grid, 2, (-1,1))
         self.assertRaises(ValueError, Grid, 2, (-1,-1))
-    
+
     def test__validate_grid_zero_h(self):
 
         self.assertRaises(ValueError, Grid, 2, 0)
@@ -78,7 +78,7 @@ class TestGrid(unittest.TestCase):
         self.assertIsNone(assert_allclose(g1.grad(x), np.ones([1,11])))
         y = np.linspace(0,1,11)
         X, Y = np.meshgrid(x, y, indexing="ij")
-        
+
         g2 = Grid(ndims=2, h=0.1, boundary="regular")
         gradX = g2.grad(X)
         self.assertTrue(gradX.shape==(2,11,11))

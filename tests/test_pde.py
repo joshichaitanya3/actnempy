@@ -52,10 +52,10 @@ class TestPDE(unittest.TestCase):
         self.assertIsNone(assert_allclose(w_all[0], w0exp, rtol=0.1))
         self.assertTrue(w_all[1,-1]==0) # The first term to be removed has to be the one with the smallest strength, which is the f3 one, and so on.
         self.assertIsNone(assert_allclose(w_all[1], w1exp, rtol=0.1))
-        self.assertTrue(w_all[2,-1]==0) 
+        self.assertTrue(w_all[2,-1]==0)
         self.assertTrue(w_all[2,-2]==0)
         self.assertIsNone(assert_allclose(w_all[2], w2exp, rtol=0.1))
-    
+
 if __name__ == "__main__":
     unittest.main()
 

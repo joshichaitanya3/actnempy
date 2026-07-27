@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 from scipy import ndimage
 import itertools
 import warnings
@@ -81,26 +81,26 @@ class Grid:
         """
         grad(f, ndims=None, h=None, boundary=None)
 
-        Computes gradient of tensor field `f` with grid spacing `h`. 
+        Computes gradient of tensor field `f` with grid spacing `h`.
         If `f` is a rank k tensor defined in an `ndims` dimensional
-        space, then `f` should have f.ndim = k + ndims. 
+        space, then `f` should have f.ndim = k + ndims.
 
         Parameters
         ----------
         f : array_like
             The tensor field of which to compute the gradient
         ndims : int
-            The number of dimensions of the system 
+            The number of dimensions of the system
             (not including tensor rank)
         h : scalar or array_like or None (default)
             The grid spacing
         boundary: str
-            Criterion for the derivatives at the boundary 
+            Criterion for the derivatives at the boundary
             boundary='periodic' indicates periodic boundary conditions
             boudary='regular' indicates the use of forward/backward
             difference at the boundaries
-            The default value used, if none is specified, is the 
-            default value for the Grid object (which, in turn, is set to 
+            The default value used, if none is specified, is the
+            default value for the Grid object (which, in turn, is set to
             'periodic')
             The default boundary condition for one instance of import
             can be changed by using set_periodic_bc() or
@@ -109,7 +109,7 @@ class Grid:
         Returns
         -------
         gradf : ndarray
-            Gradient of tensor field `f` 
+            Gradient of tensor field `f`
             with first index corresponding to the gradient direction
 
         Raises
@@ -117,7 +117,7 @@ class Grid:
         ValueError
             if `h` has incorrect shape or is not positive
         """
-        
+
         f = np.asanyarray(f)
         if ndims is None:
             ndims = self._ndims
@@ -127,7 +127,7 @@ class Grid:
             h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
-        
+
         # gradient will add another dimension of length ndims
         gradf = np.empty(tuple([ndims]+list(f.shape)),float)
         fshape = f.shape[:-ndims]
@@ -143,24 +143,24 @@ class Grid:
 
         Computes divergence of tensor field `f` with grid spacing `h`,
         If `f` is a rank k tensor defined in an `ndims` dimensional
-        space, then `f` should have f.ndim = k + ndims. 
+        space, then `f` should have f.ndim = k + ndims.
 
         Parameters
         ----------
         f : array_like
             The tensor field of which to compute the divergence
         ndims : int
-            The number of dimensions of the system 
+            The number of dimensions of the system
             (not including tensor rank)
         h : scalar or array_like or None (default)
             The grid spacing
         boundary: str
-            Criterion for the derivatives at the boundary 
+            Criterion for the derivatives at the boundary
             boundary='periodic' indicates periodic boundary conditions
             boudary='regular' indicates the use of forward/backward
             difference at the boundaries
-            The default value used, if none is specified, is the 
-            default value for the Grid object (which, in turn, is set to 
+            The default value used, if none is specified, is the
+            default value for the Grid object (which, in turn, is set to
             'periodic')
             The default boundary condition for one instance of import
             can be changed by using set_periodic_bc() or
@@ -169,9 +169,9 @@ class Grid:
         Returns
         -------
         div : ndarray
-            Divergence of tensor field `f`. 
-            If `f` is indexed f[i][j][k]... , then 
-            divf[j][k]... = sum(\\partial_i (f[i][j][k]...), 
+            Divergence of tensor field `f`.
+            If `f` is indexed f[i][j][k]... , then
+            divf[j][k]... = sum(\\partial_i (f[i][j][k]...),
             i going from 0 to (ndims-1)
 
         Raises
@@ -217,24 +217,24 @@ class Grid:
         Computes the curl of tensor field `f` with grid spacing `h`,
         assuming periodic boundary conditions. If `f` is a rank k tensor
         defined in an `ndims` dimensional space, then `f` should have
-        f.ndim = k + ndims. 
+        f.ndim = k + ndims.
 
         Parameters
         ----------
         f : array_like
             The tensor field of which to compute the curl
         ndims : int
-            The number of dimensions of the system 
+            The number of dimensions of the system
             (not including tensor rank)
         h : scalar or array_like or None (default)
             The grid spacing
         boundary: str
-            Criterion for the derivatives at the boundary 
+            Criterion for the derivatives at the boundary
             boundary='periodic' indicates periodic boundary conditions
             boudary='regular' indicates the use of forward/backward
             difference at the boundaries
-            The default value used, if none is specified, is the 
-            default value for the Grid object (which, in turn, is set to 
+            The default value used, if none is specified, is the
+            default value for the Grid object (which, in turn, is set to
             'periodic')
             The default boundary condition for one instance of import
             can be changed by using set_periodic_bc() or
@@ -244,7 +244,7 @@ class Grid:
         -------
         out : ndarray
             Curl of tensor field `f`. If `f` is indexed f[i][j][k]... ,
-            the curl[i][j][k]... = sum(levi[i,l,m]\\partial_l (f[m][j][k]...), 
+            the curl[i][j][k]... = sum(levi[i,l,m]\\partial_l (f[m][j][k]...),
             {l,m} going from 0 to (ndims-1)
 
         Raises
@@ -255,13 +255,13 @@ class Grid:
             if the rank of `f`, computed as (f.ndim - ndims), is less
             than 1 since the curl would be ill-defined.
         ValueError
-            if the number of tensor components are less than the system 
+            if the number of tensor components are less than the system
             dimension.
         ValueError
-            if the number of tensor components is more than 3, in which 
+            if the number of tensor components is more than 3, in which
             case the curl is ill-defined.
         """
-        
+
         f = np.asanyarray(f)
         if ndims is None:
             ndims = self._ndims
@@ -278,19 +278,19 @@ class Grid:
         if rank < 1:
             msg = "Curl requires at least rank 1 tensor"
             raise ValueError(msg)
-        
+
         if vdims < ndims:
             msg = (
                 "Number of tensor components must be "
                 "greater or equal to system dimension"
             )
             raise ValueError(msg)
-        
+
         if vdims > 3:
             msg = "Curl is only valid in 2 or 3 dimensions"
             raise ValueError(msg)
 
-        
+
         if ndims < vdims:
             old_shape = f.shape
             shape = f.shape + (1,) * (vdims - ndims)
@@ -307,12 +307,12 @@ class Grid:
         levi[0,2,1] = -1
         levi[2,1,0] = -1
         levi[1,0,2] = -1
-        
+
         if vdims == 2:
             out = np.zeros(f.shape[1:])
         else:
             out = np.zeros(f.shape)
-        
+
         temp = np.empty(f.shape[1:])
         for i, j, k in itertools.product(* ([range(3)]*3)):
             sign = levi[i, j, k]
@@ -320,7 +320,7 @@ class Grid:
                 continue
 
             if vdims == 2:
-                if i != 2: 
+                if i != 2:
                     continue
 
                 self.__deriv(f[k], j, h, temp, rank=rank-1,boundary=boundary)
@@ -341,24 +341,24 @@ class Grid:
 
         Computes the laplacian of tensor field `f` with grid spacing
         `h`. If `f` is a rank k tensor defined in an `ndims` dimensional
-        space, then `f` should have f.ndim = k + ndims. 
+        space, then `f` should have f.ndim = k + ndims.
 
         Parameters
         ----------
         f : array_like
             The tensor field of which to compute the laplacian
         ndims : int
-            The number of dimensions of the system 
+            The number of dimensions of the system
             (not including tensor rank)
         h : scalar or array_like or None (default)
             The grid spacing
         boundary: str
-            Criterion for the derivatives at the boundary 
+            Criterion for the derivatives at the boundary
             boundary='periodic' indicates periodic boundary conditions
             boudary='regular' indicates the use of forward/backward
             difference at the boundaries
-            The default value used, if none is specified, is the 
-            default value for the Grid object (which, in turn, is set to 
+            The default value used, if none is specified, is the
+            default value for the Grid object (which, in turn, is set to
             'periodic')
             The default boundary condition for one instance of import
             can be changed by using set_periodic_bc() or
@@ -370,7 +370,7 @@ class Grid:
             Laplacian of tensor field `f`. If `f` is indexed
             f[i][j][k]... ,
             then
-            lapf[i][j][k]... = sum(\\partial_l \\partial_l (f[i][j][k]...), 
+            lapf[i][j][k]... = sum(\\partial_l \\partial_l (f[i][j][k]...),
             l going from 0 to (ndims-1)
 
         Raises
@@ -378,7 +378,7 @@ class Grid:
         ValueError
             if `h` has incorrect shape or is not positive
         """
-        
+
         f = np.asanyarray(f)
         if ndims is None:
             ndims = self._ndims
@@ -388,9 +388,9 @@ class Grid:
             h = self._validate_grid(h, ndims)
         if boundary is None:
             boundary = self.boundary
-        
+
         invh2 = 1.0 / (h * h)
-        
+
         kernel = np.zeros(ndims*[3])
         idx = (...,) + (1,)*(ndims-1)
         for ax in range(ndims):
@@ -399,17 +399,17 @@ class Grid:
             idx = idx[-1:] + idx[:-1]
 
         lapf = np.empty(f.shape)
-        fshape = f.shape[:-ndims] # Shape of the resulting tensor 
+        fshape = f.shape[:-ndims] # Shape of the resulting tensor
 
         # Set the mode for convolutions according to the boundary
         # condition.
-        
+
         if boundary=="regular":
             mode='nearest'
         elif boundary=="periodic":
             mode='wrap'
-        
+
         for idx in itertools.product(*[range(s) for s in fshape]):
             ndimage.convolve(f[idx], kernel, mode=mode, output=lapf[idx])
-        
+
         return lapf

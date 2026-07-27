@@ -51,15 +51,15 @@ def func_unitcircle(r):
 def func_defectfind(nx, ny, filter_radius, switchsign):
     """
     func_defectfind(x,y,x0,y0)
-    
+
     Function returns scalar maps the size of the input arrays that identify regions of topological charge
-    
+
     Parameters
     ----------
     nx,ny : components of director field
     filter_radius : radius of line integral region
     switchsign : flips identity of defects +/-  --> -/+ (needed for some data sets)
-    
+
     Returns
     -------
     map : line integral map
@@ -116,18 +116,18 @@ def func_defectfind(nx, ny, filter_radius, switchsign):
 def func_defectpos(binmap, areathresh):
     """
     func_defectpos(binmap, areathresh)
-    
+
     Function identifies coordinates of defects
-    
+
     Parameters
     ----------
     binmap : logical map of candidate defect regions
-    areathresh : area threshold, keep regions greater than threshold 
-    
+    areathresh : area threshold, keep regions greater than threshold
+
     Returns
     -------
     [[x1, y1],
-    [x2, y2], et..]= list of defect coordinates     
+    [x2, y2], et..]= list of defect coordinates
     """
 
     binmap_label = label(binmap)
@@ -155,19 +155,19 @@ def func_defectpos(binmap, areathresh):
 def func_defectorient(centroids, nx, ny, filter_radius, type_str):
     """
     func_defectorient(centroids, nx, ny, filter_radius,type_str)
-    
+
     Function identifies defect orientation
-    
+
     Parameters
     ----------
     centroids : logical map of candidate defect regions
     nx,ny : director field
-    filter_radius : 
+    filter_radius :
     type_str : string that indicates defect type: "positive" or "negative"
-    
+
     Returns
     -------
-    [phi1,phi2...phiN] =  list of defect angles [0,2pi]     
+    [phi1,phi2...phiN] =  list of defect angles [0,2pi]
     """
 
     x_grid, y_grid, filter_x, filter_y, ring_filter = func_unitcircle(

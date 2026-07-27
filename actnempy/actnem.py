@@ -4,16 +4,16 @@ Active Nematics Analysis Suite
 
 Code by Chaitanya Joshi (chaitanya@brandeis.edu)
 
-The main object of this module is the ActNem class. This class combines key methods for analysis of 2D active nematics data of Q-tensor and velocity data in one place, allowing for easy processing of large datasets. 
+The main object of this module is the ActNem class. This class combines key methods for analysis of 2D active nematics data of Q-tensor and velocity data in one place, allowing for easy processing of large datasets.
 
-Functionalities include: visualizing the director and velocity, computing velocity autocorrelation and orientation autocorrelation functions in time, defect finding (with tracking coming soon). 
+Functionalities include: visualizing the director and velocity, computing velocity autocorrelation and orientation autocorrelation functions in time, defect finding (with tracking coming soon).
 
 '''
 
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
-import numpy as np 
-import matplotlib.pyplot as plt 
+import numpy as np
+import matplotlib.pyplot as plt
 import json
 from .utils import nematic_plot, compute_n, Grid, func_defectfind, func_defectpos, func_defectorient, func_plotdefects
 from tqdm import tqdm
@@ -23,11 +23,11 @@ from pathlib import Path
 
 class ActNem:
     '''
-    
+
     The Active Nematics class.
-    
-    Designed for analysis of 2D active nematics data of Q-tensor and velocity. 
-    
+
+    Designed for analysis of 2D active nematics data of Q-tensor and velocity.
+
     Attributes
     ----------
 
@@ -37,7 +37,7 @@ class ActNem:
             `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`, `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial dimensions and T being the time dimension. The preprocessing of the experimental / simulation data into this format is done elsewhere.
 
             `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying the spatial and temoral discretization of the data.
-    
+
     visual_check : bool
         An optional flag to plot the first five frames of the data as a visual check.
 
@@ -62,9 +62,9 @@ class ActNem:
                 self.Qxy_all = data['Qxy_all']
 
             # Check that the dimensions match
-            vals = [self.u_all.shape, 
-                    self.v_all.shape, 
-                    self.Qxx_all.shape, 
+            vals = [self.u_all.shape,
+                    self.v_all.shape,
+                    self.Qxx_all.shape,
                     self.Qxy_all.shape]
 
             if not all(v==self.u_all.shape for v in vals):
@@ -76,7 +76,7 @@ class ActNem:
         else:
             msg = f"Couldn't find the data at {self.processed_data_file}!"
             raise ValueError(msg)
-        
+
         # Import metadata
 
         with open(f'{data_dir}/metadata.json', 'r') as f:
@@ -85,7 +85,7 @@ class ActNem:
         self.dx = self.metadata['dx']
         self.dy = self.metadata['dy']
         self.dt = self.metadata['dt']
-        
+
         self.metadata["data_dir"] = self.data_dir
 
         (self.NX, self.NY, self.NT) = self.u_all.shape
@@ -94,15 +94,15 @@ class ActNem:
         self.X, self.Y = np.meshgrid(self.x, self.y, indexing='ij')
 
         self.grid2D = Grid(h=(self.dx,self.dy),boundary="regular",ndims=2)
-        
+
         if visual_check: # Visualize the first 5 frames as a check
             print("Visualizing the first 5 frames...")
-            self.visualize(5) 
+            self.visualize(5)
 
     def _qprint(self, x, **kwargs):
         if not self.quiet:
             return print(x, **kwargs)
-    
+
     def reset_data(self):
         '''
         Function to reload the data from the file, in case the data
@@ -119,12 +119,12 @@ class ActNem:
                 self.Qxy_all = data['Qxy_all']
 
         print("Data has been reset.")
-    
+
     def visualize(self, nframes, save=True):
         '''
         visualize(nframes, save=False)
 
-        Function to visualize the director/order and flow-field/vorticity in the data. 
+        Function to visualize the director/order and flow-field/vorticity in the data.
 
         Parameters
         ----------
@@ -132,7 +132,7 @@ class ActNem:
         nframes : int
             Number of frames. The first `nframes` frames will be visualized.
         save : bool
-            Flag to indicate whether to save the visualizations. True by default. 
+            Flag to indicate whether to save the visualizations. True by default.
         '''
         plt.ion()
         fig = plt.figure(figsize=(10,4))
@@ -174,14 +174,14 @@ class ActNem:
 
         frame : int, optional
             Time frame at which to compute the divergence. Default is 0
-        
+
         plot : bool, optional
             Flag to indicate whether to plot the spatial map of the
             divergence. Default is false
         show: bool, optional
             Flag to indicate whether to show the output of the plot.
             Default is False
-        
+
         Returns
         -------
 
@@ -191,7 +191,7 @@ class ActNem:
 
         '''
 
-        
+
         u = self.u_all[:, :, frame]
         v = self.v_all[:, :, frame]
         velocity = np.array([u, v])
@@ -218,7 +218,7 @@ class ActNem:
 
         Function to check incompressibility in the flow field by
         computing the mean and s.e.m. of the divergence of the velocity
-        across all time. 
+        across all time.
 
         Parameters
         ----------
@@ -226,19 +226,19 @@ class ActNem:
         plot : bool, optional
             Flag to indicate whether to plot the spatial map of the
             divergence. Default is false
-        
+
         Returns:
 
         means : float
             Mean of div(u) at each point in time
-        
+
         '''
 
         means = np.zeros(self.NT)
         for i in range(self.NT):
             divu = self.compute_divergence(frame=i, plot=plot)
             means[i] = divu.mean()
-        
+
         return means
 
     def _autocorr_vector(self, vx, vy):
@@ -268,10 +268,10 @@ class ActNem:
 
         vcorr : ndarray
             Array of dimensions (NT,) containing the velocity time correlation function.
-        
+
         tc : float
             The autocorrelation time in physical time units (dt * autocorelation time in frames)
-        
+
         '''
         corrs = np.zeros([self.NX*self.NY,self.NT])
         for i in range(self.NX):
@@ -284,7 +284,7 @@ class ActNem:
         tcorr = np.argmin(vcorr>1/np.exp(1)) # In frames
         tc = self.dt * tcorr
         return vcorr, tc
-    
+
     def orientation_autocorr(self):
         '''
         ocorr = orientation_autocorr()
@@ -299,7 +299,7 @@ class ActNem:
 
         tc : float
             The autocorrelation time in physical time units (dt * autocorelation time in frames)
-        
+
         '''
         corrs = np.zeros([self.NX*self.NY,self.NT])
         # (_, nx_all, ny_all) = compute_n(self.Qxx_all, self.Qxy_all)
@@ -319,20 +319,20 @@ class ActNem:
         '''
         find_defects(filter_radius=5, size_thresh=60, switchsign=0,
         frame=0, plot=False)
-        
+
         Function to find defects in a given frame.
 
         Parameters
         ----------
 
         frame : int, optional
-            Frame at which to find defects. 
+            Frame at which to find defects.
             Default is 0
         filter_radius : float, optional
-            Radius of line integral region. 
+            Radius of line integral region.
             Default is 5
         size_thresh : float, optional
-            area threshold, keep regions greater than threshold. 
+            area threshold, keep regions greater than threshold.
             Default is 60
         switchsign : flips identity of defects +/-  --> -/+ (needed for
         some data sets)
@@ -357,12 +357,12 @@ class ActNem:
 
         '''
         (_, nx, ny) = compute_n(self.Qxx_all[:,:,frame], self.Qxy_all[:,:,frame])
-        
+
         nx = nx.T
         ny = ny.T
         # create charge density map
         _, map_p, map_m = func_defectfind(nx, ny, filter_radius, switchsign)
-        
+
 
         # search map and identify circular regions of positive and negative charge
         centroids_p = func_defectpos(map_p, size_thresh)
@@ -371,7 +371,7 @@ class ActNem:
         # get the oriengation of defects
         phi_p = func_defectorient(centroids_p, nx, ny, filter_radius, "positive")
         phi_m = func_defectorient(centroids_m, nx, ny, filter_radius, "negative")
-        
+
         if plot:
             # plot defects on top of order parameter and director
             fig, ax = plt.subplots(figsize=(4.3, 4.3))
@@ -399,28 +399,28 @@ class ActNem:
             else:
                 plt.close(fig)
         return centroids_p, centroids_m, phi_p, phi_m
-    
+
     def num_defects_all(self, filter_radius=5, size_thresh=60, switchsign=0, plot=False):
         '''
         num_defects_all(filter_radius=5, size_thresh=60, switchsign=0,
         plot=False)
-        
+
         Compute the number of +1/2 and -1/2 defects in each frame
 
         Parameters
         ----------
 
         filter_radius : float, optional
-            Radius of line integral region. 
+            Radius of line integral region.
             Default is 5
         size_thresh : float, optional
-            area threshold, keep regions greater than threshold. 
+            area threshold, keep regions greater than threshold.
             Default is 60
         switchsign : flips identity of defects +/-  --> -/+ (needed for
-        some data sets) 
+        some data sets)
         plot: bool, optional
             Flag to indicate whether to plot the frame with defects
-        
+
         Returns
         -------
         num_p : ndarray
@@ -434,13 +434,13 @@ class ActNem:
 
         for frame in tqdm(range(self.NT)):
             (cp, cm, _, _) = self.find_defects(filter_radius=filter_radius,
-                                               size_thresh=size_thresh, 
-                                               switchsign=switchsign, 
-                                               frame=frame, 
+                                               size_thresh=size_thresh,
+                                               switchsign=switchsign,
+                                               frame=frame,
                                                plot=plot)
             num_p[frame] = len(cp)
             num_m[frame] = len(cm)
-        
+
         return num_p, num_m
 
 if __name__ == "__main__":

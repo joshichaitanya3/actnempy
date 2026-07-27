@@ -8,9 +8,9 @@ from .misc import remove_NaNs
 from .misc import count_NaNs
 from .misc import get_random_sample
 
-from .grid import Grid 
+from .grid import Grid
 
-from .nematic_plot import nematic_plot 
+from .nematic_plot import nematic_plot
 
 from .defect_finder import func_unitcircle
 from .defect_finder import func_defectfind

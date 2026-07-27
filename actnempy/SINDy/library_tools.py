@@ -28,7 +28,7 @@ class Function:
 
     def __repr__(self):
         return self._name
-    
+
     def __mul__(self, rhs):
         if self.func_order == 0:
             return rhs
@@ -122,7 +122,7 @@ def build_library_expr_with_base(funcs, ivars, constraints, base):
     Really, what this boils down to is constructing all possible derivatives, and a way of counting
     the differential order.
     """
-    
+
     # np.empty([],dtype=data_base.dtype)
     term_order = {'1': Function.unity()}
     for func in funcs:
@@ -131,7 +131,7 @@ def build_library_expr_with_base(funcs, ivars, constraints, base):
         f.diff_order = 0
         if f.root not in term_order:
             term_order[f.root] = f
-    
+
     for terms in itertools.combinations_with_replacement(base, constraints['func_order']):
         term = terms[0]
         term_order[terms[0].root].func_order += terms[0].func_order
@@ -160,7 +160,7 @@ def build_library_expr(funcs, ivars, constraints):
     Really, what this boils down to is constructing all possible derivatives, and a way of counting
     the differential order.
     """
-    
+
     base = []
     # np.empty([],dtype=data_base.dtype)
     term_order = {'1': Function.unity()}
@@ -196,7 +196,7 @@ def build_library_expr(funcs, ivars, constraints):
         for func in funcs:
             term_order[func.root].func_order = 0
             term_order[func.root].diff_order = 0
-            
+
 def build_base_expr(funcs, ivars, constraints):
     """
     Given function ['f', 'g', ...] and independent variables (usually spatial coordinates)
@@ -207,7 +207,7 @@ def build_base_expr(funcs, ivars, constraints):
     Really, what this boils down to is con  structing all possible derivatives, and a way of counting
     the differential order.
     """
-    
+
     base = []
     for vs in itertools.combinations_with_replacement(['1'] + ivars, constraints['diff_order']):
         for f in funcs:
@@ -230,7 +230,7 @@ def get_term_val(lib,term):
     ----------
     lib  : dtype=[('name','U50'),('val','float64',U.shape)] NumPy
            structured array for the library (where U is a
-           flattened array containing the terms). 
+           flattened array containing the terms).
         Original library
     term : str
             Name of the term to be returned
@@ -258,7 +258,7 @@ def delete_term(lib,term):
     ----------
     lib  : dtype=[('name','U50'),('val','float64',U.shape)] NumPy
             structured array for the library (where U is a
-            flattened array containing the terms). 
+            flattened array containing the terms).
     term : str
             Name of the term to be deleted
     Returns
@@ -272,7 +272,7 @@ def delete_term(lib,term):
     return np.delete( lib, np.argwhere( lib['name']==str(term) ) )
 
 def get_desc_and_X(library):
-    
+
     """
     get_desc_and_X(lib):
 
@@ -284,8 +284,8 @@ def get_desc_and_X(library):
     ----------
     library  : dtype=[('name','U50'),('val','float64',U.shape)] NumPy
                 structured array for the library (where U is a
-                flattened array containing the terms). 
-    
+                flattened array containing the terms).
+
     Returns
     -------
     desc : list of str
@@ -310,9 +310,9 @@ def convert_to_lib_as_type(lib,term,term_val):
 
     return np.array([(str(term),term_val)],
                                 dtype=lib.dtype)
-                                
-def build_constrained_library_array(funcs, base, 
-                                    data_base, ivars, 
+
+def build_constrained_library_array(funcs, base,
+                                    data_base, ivars,
                                     constraints,
                                     print_terms=False):
 
@@ -323,7 +323,7 @@ def build_constrained_library_array(funcs, base,
         f.diff_order = 0
         if f.root not in term_order:
             term_order[f.root] = f
-    
+
     # Count the number of terms first, to initialize the library array.
     library_length = len( list( build_library_expr_with_base(funcs, ivars, constraints, base) ) )
     # print(f"Expecting {library_length} terms...")
@@ -349,7 +349,7 @@ def build_constrained_library_array(funcs, base,
             # library = np.append(library,new_term)
             library[term_id]['name'] = str(term)
             library[term_id]['val'] = term_arr
-            
+
             term_id +=1
             # yield term
         for func in funcs:
@@ -374,10 +374,10 @@ def combine_terms(library,
     ----------
     library  : dtype=[('name','U50'),('val','float64',U.shape)] NumPy
                 structured array for the library (where U is a
-                flattened array containing the terms). 
+                flattened array containing the terms).
     terms    : list
                 List of strings containing the terms to combine.
-    coeffs   : list 
+    coeffs   : list
                 List of coefficients to use to combine
                 the terms.
     new_term : str
@@ -387,21 +387,21 @@ def combine_terms(library,
     new_library : dtype=[('name','U50'),('val','float64',U.shape)]
                     NumPy structured array containing the library with
                     the combined terms.
-                    Returns the original library if the new term 
+                    Returns the original library if the new term
                     already exists in it.
 
     Raises
     ------
-    ValueError 
-        if some terms in the 'terms' list are not present in the 
+    ValueError
+        if some terms in the 'terms' list are not present in the
         original library.
-    ValueError 
+    ValueError
         if the number of terms to combine is not equal to the
         number of coefficients provided.
     """
 
     library_terms = list(library['name'])
-    
+
     if new_term in set(library_terms):
         msg = f"New term {new_term} already in the library!"
         print(msg)
@@ -417,7 +417,7 @@ def combine_terms(library,
         msg = "Number of terms to combine is not equal to the \
                number of coefficients provided!"
         raise ValueError(msg)
-    
+
     library_dtype = library.dtype
     new_term_array = np.zeros_like(library[0]['val'])
     new_term_str = 'Combining {\n'
@@ -428,10 +428,10 @@ def combine_terms(library,
 
     new_term_str += '}' + f' → {new_term}'
     if show_combinations:
-        print(new_term_str)    
+        print(new_term_str)
     new_term_struct = np.array([(str(new_term),new_term_array)],
                                 dtype=library_dtype)
-    
+
     library = np.append(library,new_term_struct)
 
     return library

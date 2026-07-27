@@ -3,13 +3,13 @@ from numpy.testing import assert_allclose
 import sys
 import os
 from pathlib import Path
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import gdown
 import unittest
 from io import StringIO
 from unittest.mock import patch
 
-test_dir = Path(__file__).parent.absolute() 
+test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
@@ -17,12 +17,12 @@ from actnempy import ActNem
 import actnempy.utils as ut
 
 class TestActNem(unittest.TestCase):
-    
+
     # Download the testing data from Google Drive
     @classmethod
     def setUpClass(cls):
         print('Initializing the test sequence...')
-    
+
         cls.data_dir =  module_dir / "TestData"
 
         url = "https://drive.google.com/uc?id=1BYS1iVh9rCR_aNSnPk2qodJzDuh_2mI6"
@@ -31,7 +31,7 @@ class TestActNem(unittest.TestCase):
 
         gdown.download(url, cls.output.as_posix(), quiet=False)
 
-        cls.an = ActNem(cls.data_dir) 
+        cls.an = ActNem(cls.data_dir)
 
     # Clean up the testing data after all the tests are done
     @classmethod
@@ -71,7 +71,7 @@ class TestActNem(unittest.TestCase):
 
     def test_vcorr(self):
         print('test_vcorr')
-        
+
         vcorr, tc = self.an.velocity_autocorr()
 
         data = np.load(test_dir / "vcorr.npz")
@@ -86,7 +86,7 @@ class TestActNem(unittest.TestCase):
         data = np.load(test_dir / "ocorr.npz")
         self.assertIsNone(assert_allclose(tc, 34.0))
         self.assertIsNone(assert_allclose(ocorr, data["ocorr"]))
-    
+
     def test_find_defects(self):
 
         [cp, cm, phi_p, phi_m] = self.an.find_defects()
@@ -96,7 +96,7 @@ class TestActNem(unittest.TestCase):
         self.assertIsNone(assert_allclose(cm, data["cm"]))
         self.assertIsNone(assert_allclose(phi_p, data["phi_p"]))
         self.assertIsNone(assert_allclose(phi_m, data["phi_m"]))
-    
+
     def test_num_defects_all(self):
 
         [num_p, num_m] = self.an.num_defects_all()

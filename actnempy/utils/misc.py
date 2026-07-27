@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 from scipy.interpolate import griddata
 from scipy.ndimage import gaussian_filter
 from numpy import linalg as LA
@@ -33,7 +33,7 @@ def denoise(arr):
     arr : 3D ndarray
         array containing the values of a field with shape (nx,ny,nt)
         where t is time.
-    
+
     Returns
     -------
     arr : 3D ndarray
@@ -50,7 +50,7 @@ def denoise(arr):
     n,m = arr.shape
     (U,S,V) = LA.svd(arr, full_matrices=False)
     dim = np.count_nonzero(S > (optimal_SVHT_coef([m/n],0) * np.median(S)))
-    
+
     print(f"Optimal threshold for array = {dim}")
 
     denoised_arr = (U[:,:dim].dot(np.diag(S[:dim]).dot(V[:dim,:]))).reshape(shape)
@@ -60,7 +60,7 @@ def add_noise(arr, noise_strength=0.01, seed=None):
     """
     add_noise(arr, noise_strength, seed=None)
 
-    Function to add white Gaussian noise to an array. Uses NumPy's 
+    Function to add white Gaussian noise to an array. Uses NumPy's
     random.default_rng() generator if available, and random.randn if not.
 
     Parameters
@@ -68,8 +68,8 @@ def add_noise(arr, noise_strength=0.01, seed=None):
     arr : ndarray
         Original array
     noise_strength : float
-        Strength of the noise relative to the standard deviation 
-        of the entries of the array. 
+        Strength of the noise relative to the standard deviation
+        of the entries of the array.
         Default is 0.01
     seed : {None, int, array_like[ints], SeedSequence, BitGenerator, Generator}, optional
         Seed for NumPy's default_rng(). From its description:
@@ -80,13 +80,13 @@ def add_noise(arr, noise_strength=0.01, seed=None):
         pass in a`SeedSequence` instance
         Additionally, when passed a `BitGenerator`, it will be wrapped by
         `Generator`. If passed a `Generator`, it will be returned unaltered.
-        If default_rng is not available, this will be used as a seed 
+        If default_rng is not available, this will be used as a seed
         for the random.randn
     Returns
     -------
     arr : ndarray
         Array with added noise
-    
+
     Usage
     -----
     >>>velocity = np.ones(5,5)
@@ -113,9 +113,9 @@ def add_noise(arr, noise_strength=0.01, seed=None):
         np.random.seed(seed)
 
         return arr + noise_strength * np.std(arr) * np.random.randn(*arr.shape)
-    
+
     else:
-    
+
         rg = default_rng(seed)
 
         return arr + noise_strength * np.std(arr) * rg.standard_normal(arr.shape)
@@ -123,15 +123,15 @@ def add_noise(arr, noise_strength=0.01, seed=None):
 def compute_Q(theta,sigma=1,custom_kernel=None):
     """
     compute_Q(theta,sigma=1,custom_kernel=None)
-    
-    Function to calculate S (scalar order), Qxx and Qxy, given the 
-    orientation field theta. 
-    The calculation proceeds by computing the molecular tensor 
-    m = n \\otimes n - 1/2 I and coarse graining it. 
+
+    Function to calculate S (scalar order), Qxx and Qxy, given the
+    orientation field theta.
+    The calculation proceeds by computing the molecular tensor
+    m = n \\otimes n - 1/2 I and coarse graining it.
     The default averaging is done by a gaussian filter with sigma=1.
     A different value of sigma can be provided, or an entirely custom
     kernel can also be provided.
-    
+
     Parameters
     ----------
     theta : ndarray
@@ -148,7 +148,7 @@ def compute_Q(theta,sigma=1,custom_kernel=None):
     S : ndarray
         Scalar order parameter
     Qxx : ndarray
-        Values of Qxx 
+        Values of Qxx
     Qxy : ndarray
         Values of Qxy
     """
@@ -161,12 +161,12 @@ def compute_Q(theta,sigma=1,custom_kernel=None):
         else:
             average = lambda f : cv2.filter2D(f,-1,custom_kernel)
 
-    
+
     nx = np.cos(theta)
     ny = np.sin(theta)
     mQxx = (nx**2 - 0.5)
     mQxy = (nx*ny)
-    
+
     Qxx = average(mQxx)
     Qxy = average(mQxy)
     S = 2*np.sqrt( Qxx**2 + Qxy**2)
@@ -175,24 +175,24 @@ def compute_Q(theta,sigma=1,custom_kernel=None):
 def compute_n(Qxx,Qxy):
     """
     compute_n(Qxx,Qxy)
-    
+
     Function to calculate S (scalar order), nx and ny, given Qxx and
     Qxy. It imposes ny>0, such that theta = np.arctan2(ny,nx) lies
     between 0 to pi.
-    
+
     Parameters
     ----------
     Qxx : ndarray
         2D array containing values of Qxx at a given time.
     Qxy : ndarray
         2D array containing values of Qxy at a given time.
-    
+
     Returns
     -------
     S : ndarray
         Scalar order parameter
     nx : ndarray
-        Values of nx such that -1 <= nx <= 1 
+        Values of nx such that -1 <= nx <= 1
     ny : ndarray
         Values of ny such that 0 <= ny <= 1.
         This ensures 0 <= theta <= pi
@@ -200,7 +200,7 @@ def compute_n(Qxx,Qxy):
     S = 2*np.sqrt( Qxx**2 + Qxy**2)
     Qxx = Qxx/S
     Qxy = Qxy/S
-    
+
     # Evaluate nx and ny from normalized Qxx and Qxy
     nx = np.sqrt( Qxx + 0.5 )
     with warnings.catch_warnings(record=True) as wrng:
@@ -216,7 +216,7 @@ def remove_NaNs(field, nematic=False):
 
     Function to remove (*in place*) spurious NaNs appearing in the field data. This
     is done by replacing the NaN with the nanmean of its nearest
-    neighbors. 
+    neighbors.
     If the field is an orienatation field of a nematic with angular
     values, the same operation is performed on cos(2theta) and
     sin(2theta) to preserve the nematic symmetry, and then converted
@@ -228,11 +228,11 @@ def remove_NaNs(field, nematic=False):
     field : ndarray
         A 2D array containing the value of a single scalar field (eg.
         theta, vx or vy) at a single point of time (shape NX x NY)
-    
+
     nematic : bool, optional
         Flag to indicate whether the field as an angluar field. Default
         is False.
-    
+
     Returns
     -------
     None (The array is changed in place.)
@@ -266,7 +266,7 @@ def count_NaNs(arr):
     ----------
     arr: ndarray
         Array which potentially contains NaNs
-    
+
     Returns
     -------
     num : int
@@ -287,7 +287,7 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     num_points : int
         Number of samples required
     box_size : 3-tuple or int
-        Size of the box to be sampled. This can either be supplied as a 3-tuple, with one integer for each dimension, or an int, in which case a cubical box will be sampled. 
+        Size of the box to be sampled. This can either be supplied as a 3-tuple, with one integer for each dimension, or an int, in which case a cubical box will be sampled.
     diff_order : int
         Number of derivatives of the original array the user is expecting to take. This is used to make sure points close to the boundary whose derivatives cannot be taken are not included in the boxes.
     seed : int, optional
@@ -299,16 +299,16 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
             Dictionary containing the coordinates of the box centers, with the keys being the indices.
         views : dict
             Dictionary containing the slices that return the box when indexed with.
-    
+
     Usage
     -----
         _, views, = get_random_sample(u_all.shape, 100, 5, 2, 1)
-        
+
         for key, view in views.items():
-                
+
             u_view = u_all[view].copy()
             ...
-        
+
     '''
     if isinstance(box_size, int):
         if box_size < 0:
@@ -317,11 +317,11 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
         box_size = (box_size,) * len(shp)
 
     n_diff = 2 * np.ceil(diff_order/2.0)
-    
+
     window = tuple([int(i+n_diff) for i in box_size])
-    
+
     bdy = tuple([int((i+1)/2) for i in window])
-    
+
     box_bdy = tuple([int((i+1)/2) for i in box_size])
 
     # Now sample random points that lie between bdy and shp-bdy.
@@ -329,7 +329,7 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     # t directions and combine them. This has a minute risk of sampling
     # the same point twice, which we further reduce by sampling
     # `1.5*num_points` points and then choosing `num_points` number of
-    # unique points from it. 
+    # unique points from it.
 
     if no_rng:
         np.random.seed(seed)
@@ -350,7 +350,7 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     # different seed or for lesser number of points.
     if picked_points.shape[1]<num_points:
         raise ValueError("Couldn't sample enough number of unique points! Try a different seed for `get_random_sample` or try lesser number of points.")
-    
+
     points = {}
     views = {}
 

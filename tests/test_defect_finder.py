@@ -13,7 +13,7 @@ test_dir = Path(__file__).parent.absolute()
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
 
-from actnempy.utils import defect_finder as df 
+from actnempy.utils import defect_finder as df
 
 
 def defectpair(X, Y, dist, varphi1, varphi2, rcore=0.1):
@@ -26,14 +26,14 @@ def defectpair(X, Y, dist, varphi1, varphi2, rcore=0.1):
     '''
     dth = varphi2-varphi1 + np.pi/2
     Th = varphi1 - np.pi/2
-    th = ( -0.5*np.arctan2(X+0.5*dist, Y) 
-          + 0.5*np.arctan2(X-0.5*dist, Y) 
+    th = ( -0.5*np.arctan2(X+0.5*dist, Y)
+          + 0.5*np.arctan2(X-0.5*dist, Y)
           + 0.5*dth*(1+(np.log((X+0.5*dist)**2+Y**2)-np.log((X-0.5*dist)**2+Y**2))/(2*np.log(dist/rcore)))
           + Th)
 
     th[((X+0.5*dist)**2+Y**2<rcore**2)] = 0
     th[((X-0.5*dist)**2+Y**2<rcore**2)] = 0
-    
+
     return th.T
 
 
@@ -83,9 +83,9 @@ class TestDefectFinder(unittest.TestCase):
         self.assertTrue(np.abs(cp[0][1])<0.25)
         self.assertTrue(np.abs(cm[0][0]-5)<0.25)
         self.assertTrue(np.abs(cm[0][1])<0.25)
-    
+
     def test_defectorient(self):
-        
+
         nx = np.cos(self.th)
         ny = np.sin(self.th)
         _, map_p, map_m = df.func_defectfind(nx, ny, filter_radius=5, switchsign=0)

@@ -3,7 +3,7 @@ from numpy.testing import assert_allclose
 import sys
 import os
 from pathlib import Path
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import unittest
 from io import StringIO
 from unittest.mock import patch
@@ -20,9 +20,9 @@ from actnempy.SINDy import library_tools as lt
 class TestLibraryTools(unittest.TestCase):
 
     def test_function(self):
-        
+
         uf = lt.Function("u", maxf=3, maxd=4)
-        
+
         self.assertEqual(uf.__repr__(), "u")
         self.assertEqual(uf.diff_order, 0)
         self.assertEqual(uf.func_order, 1)
@@ -46,7 +46,7 @@ class TestLibraryTools(unittest.TestCase):
         self.assertEqual(wf.__repr__(), "u \u00D7 v")
         self.assertEqual(wf.diff_order, 0)
         self.assertEqual(wf.func_order, 2)
-    
+
     def test_multiplybyunity(self):
 
         unity = lt.Function.unity()
@@ -57,13 +57,13 @@ class TestLibraryTools(unittest.TestCase):
         self.assertEqual(wf.__repr__(), "v")
         self.assertEqual(wf.diff_order, 0)
         self.assertEqual(wf.func_order, 1)
-        
+
         # Checking right-multiply
         wf = vf * unity
         self.assertEqual(wf.__repr__(), "v")
         self.assertEqual(wf.diff_order, 0)
         self.assertEqual(wf.func_order, 1)
-        
+
         # Checking unity times unity
         wf = unity * unity
         self.assertEqual(wf.__repr__(), "1")
@@ -92,24 +92,24 @@ class TestLibraryTools(unittest.TestCase):
         ux2f = lt.Derivative(uxf, "x")
         self.assertEqual(ux2f.__repr__(), "(∂²u/∂x²)")
         self.assertEqual(ux2f.diff_order, 2)
-    
+
     def test_multiply_derivative(self):
 
         uf = lt.Function("u", maxf=3, maxd=4)
         uxf = lt.Derivative(uf, "x")
 
         # Multiply function with derivative
-        wf = uf * uxf 
+        wf = uf * uxf
         self.assertEqual(wf.__repr__(), "u \u00D7 (∂u/∂x)")
         self.assertEqual(wf.func_order, 2)
         self.assertEqual(wf.diff_order, 1)
 
         # Multiply derivative with derivative
-        wf = uxf * uxf 
+        wf = uxf * uxf
         self.assertEqual(wf.__repr__(), "(∂u/∂x) \u00D7 (∂u/∂x)")
         self.assertEqual(wf.func_order, 2)
         self.assertEqual(wf.diff_order, 2)
-    
+
     # Testing base expression building
     def test_build_base_expr_1(self):
 
@@ -126,7 +126,7 @@ class TestLibraryTools(unittest.TestCase):
         self.assertEqual(base[1].__repr__(), "(∂u/∂x)")
         self.assertEqual(base[2].__repr__(), "(∂²u/∂x²)")
         self.assertEqual(base[3].__repr__(), "1")
-    
+
     def test_build_base_expr_2(self):
 
         uf = lt.Function("u", maxf=1, maxd=3)
@@ -138,19 +138,19 @@ class TestLibraryTools(unittest.TestCase):
         }
         base = lt.build_base_expr(funcs, ivars, constraints)
 
-        base_exp = ["u", 
-                    "(∂u/∂x)", 
-                    "(∂u/∂y)", 
-                    "(∂²u/∂x²)", 
-                    "(∂²u/∂x∂y)", 
-                    "(∂²u/∂y²)", 
+        base_exp = ["u",
+                    "(∂u/∂x)",
+                    "(∂u/∂y)",
+                    "(∂²u/∂x²)",
+                    "(∂²u/∂x∂y)",
+                    "(∂²u/∂y²)",
                     "1"]
 
         n = len(base_exp)
         self.assertEqual(len(base), n)
         for i in range(n):
             self.assertEqual(base[i].__repr__(), base_exp[i])
-    
+
     def test_build_base_expr_3(self):
 
         uf = lt.Function("u", maxf=1, maxd=3)
@@ -163,13 +163,13 @@ class TestLibraryTools(unittest.TestCase):
         }
         base = lt.build_base_expr(funcs, ivars, constraints)
 
-        base_exp = ["u", 
-                    "v", 
-                    "(∂u/∂x)", 
-                    "(∂v/∂x)", 
-                    "(∂²u/∂x²)", 
+        base_exp = ["u",
+                    "v",
+                    "(∂u/∂x)",
+                    "(∂v/∂x)",
+                    "(∂²u/∂x²)",
                     "1"]
-        
+
         n = len(base_exp)
         self.assertEqual(len(base), n)
         for i in range(n):
@@ -190,24 +190,24 @@ class TestLibraryTools(unittest.TestCase):
         # lib = list(lib)
 
         lib_exp = ["u \u00D7 v \u00D7 v",
-                   "u \u00D7 v \u00D7 (∂v/∂x)", 
-                   "u \u00D7 v", 
-                   "u \u00D7 (∂v/∂x)", 
-                   "u", 
-                   "v \u00D7 v \u00D7 (∂u/∂x)", 
-                   "v \u00D7 v \u00D7 (∂²u/∂x²)", 
-                   "v \u00D7 v", 
-                   "v \u00D7 (∂u/∂x) \u00D7 (∂v/∂x)", 
-                   "v \u00D7 (∂u/∂x)", 
-                   "v \u00D7 (∂v /∂x)", 
-                   "v \u00D7 (∂²u /∂x²)", 
-                   "v", 
-                   "(∂v/∂x) \u00D7 (∂u/∂x)", 
-                   "(∂u/∂x)", 
-                   "(∂v/∂x)", 
-                   "(∂²u/∂x²)", 
+                   "u \u00D7 v \u00D7 (∂v/∂x)",
+                   "u \u00D7 v",
+                   "u \u00D7 (∂v/∂x)",
+                   "u",
+                   "v \u00D7 v \u00D7 (∂u/∂x)",
+                   "v \u00D7 v \u00D7 (∂²u/∂x²)",
+                   "v \u00D7 v",
+                   "v \u00D7 (∂u/∂x) \u00D7 (∂v/∂x)",
+                   "v \u00D7 (∂u/∂x)",
+                   "v \u00D7 (∂v /∂x)",
+                   "v \u00D7 (∂²u /∂x²)",
+                   "v",
+                   "(∂v/∂x) \u00D7 (∂u/∂x)",
+                   "(∂u/∂x)",
+                   "(∂v/∂x)",
+                   "(∂²u/∂x²)",
                    "1"]
-        
+
         n = len(lib_exp)
 
         self.assertEqual(len(list(lib)), n)

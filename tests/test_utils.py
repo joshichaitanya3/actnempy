@@ -36,7 +36,7 @@ class TestUtils(unittest.TestCase):
     @skip("This test still needs to be written.")
     def test_denoise(self):
         pass
-    
+
     def test_add_noise(self):
 
         a = np.random.default_rng().standard_normal(tuple([100, 100]))
@@ -61,7 +61,7 @@ class TestUtils(unittest.TestCase):
         self.assertIsNone(assert_allclose(S, S0))
         self.assertIsNone(assert_allclose(nx, nx0))
         self.assertIsNone(assert_allclose(ny, ny0))
-        
+
         pass
 
     def test_remove_NaNs(self):
@@ -69,7 +69,7 @@ class TestUtils(unittest.TestCase):
         # Setup the array x such that it is pi/2 almost everywhere.
         # It has a NaN in one location, and two points around it have values -pi/2.
         # Note that the values around the NaN now average to zero, but not if they are director angles, since pi/2 and -pi/2 are equivalent.
-        
+
         x = 0.5* np.pi * np.ones([10,10])
         x[4,4] = -0.5 * np.pi
         x[5,4] = np.nan
@@ -77,22 +77,22 @@ class TestUtils(unittest.TestCase):
 
         # Remove NaNs
         ut.remove_NaNs(x)
-        
+
         # Expect average value to be zero
         self.assertAlmostEqual(abs(x[5,4]), 0.0)
 
         # Now putting the NaN back
         x[5,4] = np.nan
-        
+
         # Removing it assuming the data being a nematic director
         ut.remove_NaNs(x, nematic=True)
-        
+
         # Expect the value to be +- pi/2, since they are equivalent for a nematic field
         self.assertAlmostEqual(abs(x[5,4]), 0.5 * np.pi)
 
     def test_count_NaNs(self):
         a = np.zeros([5,5])
-        a[1,2] = np.nan 
+        a[1,2] = np.nan
         a[2,3] = np.nan
         self.assertEqual(ut.count_NaNs(a),2)
 
@@ -109,8 +109,8 @@ class TestUtils(unittest.TestCase):
             # The returned size is slightly larger than 15 so that we
             # can ignore the 1 edge point in all directions to
             # accomodate the 2nd order derivatives
-            self.assertEqual(a[view].shape, tuple([17,17,17])) 
-    
+            self.assertEqual(a[view].shape, tuple([17,17,17]))
+
     # Same as above but with diff_order 3
     def test_get_random_sample3(self):
 
@@ -125,7 +125,7 @@ class TestUtils(unittest.TestCase):
             # The returned size is slightly larger than 15 so that we
             # can ignore the 2 edges point in all directions to
             # accomodate the 3rd order derivatives
-            self.assertEqual(a[view].shape, tuple([19,19,19])) 
+            self.assertEqual(a[view].shape, tuple([19,19,19]))
 
 if __name__ == "__main__":
     unittest.main()

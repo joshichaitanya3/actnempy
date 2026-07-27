@@ -1,9 +1,9 @@
-import numpy as np 
+import numpy as np
 import matplotlib.pyplot as plt
 from ..utils.misc import add_noise
 from .library_tools import delete_term
 from .anise import Anise
-from .pde import PDE 
+from .pde import PDE
 from pathlib import Path
 
 class Benchmark(Anise):
@@ -12,12 +12,12 @@ class Benchmark(Anise):
         '''
         add_noise_all(noise_strength, seed=None)
 
-        Function to add white Gaussian noise to all the fields in place. (Check the method `reset_data` to reset the data.) Uses NumPy's  random.default_rng() generator if available, and random.randn if not. This is done using a helper function `add_noise` (imported from the `utils`) to add the noise to each individual field. 
+        Function to add white Gaussian noise to all the fields in place. (Check the method `reset_data` to reset the data.) Uses NumPy's  random.default_rng() generator if available, and random.randn if not. This is done using a helper function `add_noise` (imported from the `utils`) to add the noise to each individual field.
 
         Parameters
         ----------
         noise_strength : float
-            Strength of the noise relative to the standard deviation. This is done per field across space and time. 
+            Strength of the noise relative to the standard deviation. This is done per field across space and time.
             Default is 0.01
         seed : {None, int, array_like[ints], SeedSequence, BitGenerator, Generator}, optional
             Seed for NumPy's default_rng(). From its description:
@@ -35,7 +35,7 @@ class Benchmark(Anise):
         print("Generating libraries...")
         (lib_lhs, lib_Q, lib_NS, lib_Stokes,
          lib_overdamped) = self.generate_libraries_int()
-        
+
         print("Computing the PDE for Stokes flow...")
         pde_St = PDE(lib_Stokes, lib_lhs, '∇²ω', self.metadata)
         print("Done! Stored under pde_St.\n")
@@ -64,9 +64,9 @@ class Benchmark(Anise):
         pde_St_w = PDE(lib_St, lib_lhs, '∇²u', self.metadata)
 
         id = np.argwhere(pde_St_w.rhs["name"] == "∇·Q").flatten()[0]
-        
+
         return pde_St_w.w_all[-2,id]
-    
+
     def weak_form_benchmark_window_size(self, noise_strength=1e-1):
 
         samples = 3
@@ -160,11 +160,11 @@ class Benchmark(Anise):
     def run(self):
 
         noise_levels = np.array([0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0])
-        
+
         alphas_int = np.zeros(noise_levels.shape)
 
         alphas_weak = np.zeros(noise_levels.shape)
-        
+
         for i, noise_strength in enumerate(noise_levels):
 
             self.reset_data()
@@ -177,6 +177,6 @@ class Benchmark(Anise):
 
             print(
                 f"Noise strength: {noise_strength}, Int: {alphas_int[i]}, Weak: {alphas_weak[i]}")
-        
+
         return noise_levels, alphas_int, alphas_weak
 
