@@ -25,3 +25,30 @@ from .library_tools import combine_terms
 from .weak_form import TestFunction
 from .weak_form import TestRxx
 from .weak_form import TestRxy
+
+__all__ = [
+    "Anise",
+    "Benchmark",
+    "PDE",
+    "HRidge",
+    "kfold_cv",
+    "print_pde",
+    "Function",
+    "MultiplyOp",
+    "Derivative",
+    "check_individual_constraints",
+    "build_library_expr_with_base",
+    "build_library_expr",
+    "build_base_expr",
+    "get_term_val",
+    "get_rhs",
+    "delete_term",
+    "get_desc_and_X",
+    "add_term",
+    "convert_to_lib_as_type",
+    "build_constrained_library_array",
+    "combine_terms",
+    "TestFunction",
+    "TestRxx",
+    "TestRxy",
+]

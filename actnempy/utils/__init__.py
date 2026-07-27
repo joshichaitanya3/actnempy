@@ -21,3 +21,23 @@ from .defect_finder import func_wrap
 from .defect_finder import func_crop
 
 from .optimal_SVHT_coef import optimal_SVHT_coef
+
+__all__ = [
+    "denoise",
+    "add_noise",
+    "compute_Q",
+    "compute_n",
+    "remove_NaNs",
+    "count_NaNs",
+    "get_random_sample",
+    "Grid",
+    "nematic_plot",
+    "func_unitcircle",
+    "func_defectfind",
+    "func_defectpos",
+    "func_defectorient",
+    "func_plotdefects",
+    "func_wrap",
+    "func_crop",
+    "optimal_SVHT_coef",
+]
