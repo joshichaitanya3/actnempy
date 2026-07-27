@@ -178,7 +178,7 @@ def nematic_plot(
                 and grid.y_origin <= ys <= grid.y_origin + grid.height
             ):
                 raise ValueError(
-                    "Starting point ({}, {}) outside of data boundaries".format(xs, ys)
+                    f"Starting point ({xs}, {ys}) outside of data boundaries"
                 )
 
         # Convert start_points from data to array coords
