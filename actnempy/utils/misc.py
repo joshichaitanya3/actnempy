@@ -1,11 +1,8 @@
 import numpy as np
-from scipy.interpolate import griddata
 from scipy.ndimage import gaussian_filter
 from numpy import linalg as LA
-import matplotlib.pyplot as plt
 from .optimal_SVHT_coef import optimal_SVHT_coef
 import warnings
-from IPython import get_ipython
 
 # Check if cv2 library is available
 no_cv2 = False

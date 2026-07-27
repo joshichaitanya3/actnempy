@@ -1,8 +1,6 @@
 import numpy as np
 import sys
-import os
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 module_dir = Path(__file__).parent.parent.absolute() # The modules are two directories up
 sys.path.append(module_dir.as_posix())

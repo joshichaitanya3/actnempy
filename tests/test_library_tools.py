@@ -1,12 +1,5 @@
-import numpy as np
-from numpy.testing import assert_allclose
-import sys
-import os
 from pathlib import Path
-import matplotlib.pyplot as plt
 import unittest
-from io import StringIO
-from unittest.mock import patch
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
@@ -14,8 +7,6 @@ module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
 
 
-from actnempy import ActNem
-import actnempy.utils as ut
 from actnempy.SINDy import library_tools as lt
 class TestLibraryTools(unittest.TestCase):
 

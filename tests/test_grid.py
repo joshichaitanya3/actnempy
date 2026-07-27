@@ -1,12 +1,7 @@
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
-import sys
-import os
 from pathlib import Path
 import unittest
-from io import StringIO
-from unittest.mock import patch
-from unittest import skip
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up

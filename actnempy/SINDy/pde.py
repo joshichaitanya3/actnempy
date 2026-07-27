@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt
 from .library_tools import get_term_val
 import warnings
 from ..utils.grid import Grid
-from pathlib import Path
 from sklearn.metrics import r2_score
 
 def HRidge(X0, y, lam, normalize = 2):

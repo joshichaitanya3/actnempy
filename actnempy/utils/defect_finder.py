@@ -8,8 +8,6 @@
 # -----------------
 # numerical basics
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 
 # -----------------
 # image convolution
@@ -19,11 +17,7 @@ from scipy import signal
 # -----------------
 # image processing
 
-from skimage.io import imread, imshow
-from skimage.filters import gaussian, threshold_otsu
-from skimage.measure import label, regionprops, regionprops_table
-from skimage import measure
-import math
+from skimage.measure import label, regionprops
 
 def func_unitcircle(r):
     # just makes a ring of ones

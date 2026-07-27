@@ -1,19 +1,14 @@
 import numpy as np
 from numpy.testing import assert_allclose
-import sys
-import os
 from pathlib import Path
 import unittest
-from io import StringIO
-from unittest.mock import patch
-from unittest import skip
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
 
-from actnempy.SINDy import HRidge, print_pde, kfold_cv
+from actnempy.SINDy import HRidge
 
 class TestPDE(unittest.TestCase):
 

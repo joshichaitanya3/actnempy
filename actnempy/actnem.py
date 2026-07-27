@@ -18,8 +18,6 @@ import json
 from .utils import nematic_plot, compute_n, Grid, func_defectfind, func_defectpos, func_defectorient, func_plotdefects
 from tqdm import tqdm
 from scipy.signal import correlate
-import sys
-from pathlib import Path
 
 class ActNem:
     '''

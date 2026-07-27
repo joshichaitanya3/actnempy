@@ -1,14 +1,5 @@
 import sympy as sym
 import numpy as np
-import matplotlib.pyplot as plt
-from ..utils import get_random_sample, Grid
-from tqdm import tqdm
-# Check if numpy.random.default_rng is available
-no_rng = False
-try:
-    from numpy.random import default_rng
-except ImportError:
-    no_rng = True
 
 class TestFunction:
     def __init__(self, p, q, r, window_size, dx, dy, dt):

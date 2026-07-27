@@ -1,9 +1,7 @@
 import numpy as np
 from numpy.testing import assert_allclose
-import sys
 import os
 from pathlib import Path
-import matplotlib.pyplot as plt
 import gdown
 import unittest
 from io import StringIO
@@ -14,7 +12,6 @@ test_dir = Path(__file__).parent.absolute()
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
 from actnempy import ActNem
-import actnempy.utils as ut
 
 class TestActNem(unittest.TestCase):
 
@@ -29,14 +26,19 @@ class TestActNem(unittest.TestCase):
 
         cls.output = cls.data_dir / "processed_data.npz"
 
-        gdown.download(url, cls.output.as_posix(), quiet=False)
+        # Skip the download if the file is already present (e.g. restored
+        # from a CI cache), and only remove what this run downloaded.
+        cls.downloaded_by_test = not cls.output.exists()
+        if cls.downloaded_by_test:
+            gdown.download(url, cls.output.as_posix(), quiet=False)
 
         cls.an = ActNem(cls.data_dir)
 
     # Clean up the testing data after all the tests are done
     @classmethod
     def tearDownClass(cls):
-        os.remove(cls.output)
+        if cls.downloaded_by_test:
+            os.remove(cls.output)
 
     def setUp(self):
         pass

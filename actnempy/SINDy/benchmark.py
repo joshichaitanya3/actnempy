@@ -4,7 +4,6 @@ from ..utils.misc import add_noise
 from .library_tools import delete_term
 from .anise import Anise
 from .pde import PDE
-from pathlib import Path
 
 class Benchmark(Anise):
 

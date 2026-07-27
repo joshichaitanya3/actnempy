@@ -10,19 +10,15 @@ The main object of this module is the Class Anise, which is designed to handle m
 
 '''
 
-from ..utils import func_defectfind, func_defectpos, func_defectorient, func_plotdefects
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import numpy as np
-import matplotlib.pyplot as plt
 import json
-from ..utils import Grid, nematic_plot, add_noise, compute_n, get_random_sample
+from ..utils import Grid, get_random_sample
 from .library_tools import Function, build_base_expr, build_constrained_library_array, get_term_val
 from .weak_form import TestFunction, TestRxx, TestRxy
 from .pde import PDE
 from tqdm import tqdm
-from pathlib import Path
-from scipy.signal import correlate
 from ..actnem import ActNem
 
 class Anise(ActNem):
