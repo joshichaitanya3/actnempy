@@ -13,14 +13,14 @@ module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
 from actnempy import ActNem
 
-class TestActNem(unittest.TestCase):
 
+class TestActNem(unittest.TestCase):
     # Download the testing data from Google Drive
     @classmethod
     def setUpClass(cls):
-        print('Initializing the test sequence...')
+        print("Initializing the test sequence...")
 
-        cls.data_dir =  module_dir / "TestData"
+        cls.data_dir = module_dir / "TestData"
 
         url = "https://drive.google.com/uc?id=1BYS1iVh9rCR_aNSnPk2qodJzDuh_2mI6"
 
@@ -46,17 +46,17 @@ class TestActNem(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @patch('sys.stdout', new_callable=StringIO)
+    @patch("sys.stdout", new_callable=StringIO)
     def test__qprint(self, mock_stdout):
 
         # Expect no output when quiet==True
         self.an.quiet = True
-        self.an._qprint('foo')
+        self.an._qprint("foo")
         assert mock_stdout.getvalue() == ""
 
         # Expect normal print behavior when quiet==False
         self.an.quiet = False
-        self.an._qprint('foo')
+        self.an._qprint("foo")
         assert mock_stdout.getvalue() == "foo\n"
 
     def test_reset_data(self):
@@ -72,7 +72,7 @@ class TestActNem(unittest.TestCase):
         self.assertIsNone(assert_allclose(divu, data["divu"]))
 
     def test_vcorr(self):
-        print('test_vcorr')
+        print("test_vcorr")
 
         vcorr, tc = self.an.velocity_autocorr()
 
@@ -81,7 +81,7 @@ class TestActNem(unittest.TestCase):
         self.assertIsNone(assert_allclose(vcorr, data["vcorr"]))
 
     def test_ocorr(self):
-        print('test_ocorr')
+        print("test_ocorr")
 
         ocorr, tc = self.an.orientation_autocorr()
 

@@ -1,10 +1,11 @@
 import sympy as sym
 import numpy as np
 
+
 class TestFunction:
     def __init__(self, p, q, r, window_size, dx, dy, dt):
 
-        self.x, self.y, self.t = sym.symbols('x y t')
+        self.x, self.y, self.t = sym.symbols("x y t")
         self.p = p
         self.q = q
         self.r = r
@@ -13,10 +14,10 @@ class TestFunction:
         self.dt = dt
         self.window_size = window_size
 
-        xvals = np.linspace(-1,1,window_size[0])
-        yvals = np.linspace(-1,1,window_size[1])
-        tvals = np.linspace(-1,1,window_size[2])
-        self.Xm, self.Ym, self.Tm = np.meshgrid(xvals, yvals, tvals, indexing='ij')
+        xvals = np.linspace(-1, 1, window_size[0])
+        yvals = np.linspace(-1, 1, window_size[1])
+        tvals = np.linspace(-1, 1, window_size[2])
+        self.Xm, self.Ym, self.Tm = np.meshgrid(xvals, yvals, tvals, indexing="ij")
 
         self._define_psi()
 
@@ -26,15 +27,15 @@ class TestFunction:
         q = self.q
         r = self.r
         if r is None:
-            self.ψ = (self.x**2 -1)**p * (self.y**2 - 1)**q
+            self.ψ = (self.x**2 - 1) ** p * (self.y**2 - 1) ** q
         else:
-            self.ψ = sym.sin(r*π*self.t) * (self.x**2 -1)**p * (self.y**2 - 1)**q
+            self.ψ = sym.sin(r * π * self.t) * (self.x**2 - 1) ** p * (self.y**2 - 1) ** q
 
     def __str__(self):
         return str(self.ψ)
 
     def grad(self, nx=0, ny=0, nt=0):
-        dψ = sym.diff(self.ψ ,self.x, nx, self.y, ny, self.t, nt)
+        dψ = sym.diff(self.ψ, self.x, nx, self.y, ny, self.t, nt)
 
         dpsi = sym.lambdify([self.x, self.y, self.t], dψ, "numpy")
 
@@ -50,7 +51,7 @@ class TestFunction:
         return psi(self.Xm, self.Ym, self.Tm)
 
     def grad_sym(self, nx=0, ny=0, nt=0):
-        return sym.diff(self.ψ ,self.x, nx, self.y, ny, self.t, nt)
+        return sym.diff(self.ψ, self.x, nx, self.y, ny, self.t, nt)
 
 
 class TestRxx(TestFunction):
@@ -61,9 +62,15 @@ class TestRxx(TestFunction):
         r = self.r
         # self.ψ = sym.sin(r*π*self.t) * (self.x**2 -1)**p * (self.y**2 - 1)**q
         if r is None:
-            self.ψ = (self.x**2 -1)**p * (self.y**2 - 1)**q * sym.cos(self.x)
+            self.ψ = (self.x**2 - 1) ** p * (self.y**2 - 1) ** q * sym.cos(self.x)
         else:
-            self.ψ = sym.sin(r*π*self.t) * (self.x**2 -1)**p * (self.y**2 - 1)**q * sym.cos(self.x)
+            self.ψ = (
+                sym.sin(r * π * self.t)
+                * (self.x**2 - 1) ** p
+                * (self.y**2 - 1) ** q
+                * sym.cos(self.x)
+            )
+
 
 class TestRxy(TestFunction):
     def _define_psi(self):
@@ -73,9 +80,15 @@ class TestRxy(TestFunction):
         r = self.r
         # self.ψ = sym.sin(r*π*self.t) * (self.x**2 -1)**p * (self.y**2 - 1)**q
         if r is None:
-            self.ψ = (self.x**2 -1)**p * (self.y**2 - 1)**q * sym.sin(self.x)
+            self.ψ = (self.x**2 - 1) ** p * (self.y**2 - 1) ** q * sym.sin(self.x)
         else:
-            self.ψ = sym.sin(r*π*self.t) * (self.x**2 -1)**p * (self.y**2 - 1)**q * sym.sin(self.x)
+            self.ψ = (
+                sym.sin(r * π * self.t)
+                * (self.x**2 - 1) ** p
+                * (self.y**2 - 1) ** q
+                * sym.sin(self.x)
+            )
+
 
 if __name__ == "__main__":
     pass

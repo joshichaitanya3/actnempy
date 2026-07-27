@@ -30,22 +30,24 @@ import matplotlib.pyplot as plt
 __all__ = ["nematic_plot"]
 
 
-def nematic_plot(x,
-                 y,
-                 u,
-                 v,
-                 ax=None,
-                 density=1,
-                 linewidth=None,
-                 color=None,
-                 cmap=None,
-                 norm=None,
-                 transform=None,
-                 zorder=None,
-                 start_points=None,
-                 minlength=0.1,
-                 maxlength=4.0,
-                 integration_direction='both'):
+def nematic_plot(
+    x,
+    y,
+    u,
+    v,
+    ax=None,
+    density=1,
+    linewidth=None,
+    color=None,
+    cmap=None,
+    norm=None,
+    transform=None,
+    zorder=None,
+    start_points=None,
+    minlength=0.1,
+    maxlength=4.0,
+    integration_direction="both",
+):
     """
     Draw the streamlines of a nematic vector field.
 
@@ -118,38 +120,37 @@ def nematic_plot(x,
         color = axes._get_lines.get_next_color()
 
     if linewidth is None:
-        linewidth = matplotlib.rcParams['lines.linewidth']
+        linewidth = matplotlib.rcParams["lines.linewidth"]
 
     line_kw = {}
 
-    if integration_direction not in ['both', 'forward', 'backward']:
-        errstr = ("Integration direction '%s' not recognised. "
-                  "Expected 'both', 'forward' or 'backward'." %
-                  integration_direction)
+    if integration_direction not in ["both", "forward", "backward"]:
+        errstr = (
+            "Integration direction '%s' not recognised. "
+            "Expected 'both', 'forward' or 'backward'." % integration_direction
+        )
         raise ValueError(errstr)
 
-    if integration_direction == 'both':
-        maxlength /= 2.
+    if integration_direction == "both":
+        maxlength /= 2.0
 
     use_multicolor_lines = isinstance(color, np.ndarray)
     if use_multicolor_lines:
         if color.shape != grid.shape:
-            raise ValueError(
-                "If 'color' is given, must have the shape of 'Grid(x,y)'")
+            raise ValueError("If 'color' is given, must have the shape of 'Grid(x,y)'")
         line_colors = []
         color = np.ma.masked_invalid(color)
     else:
-        line_kw['color'] = color
+        line_kw["color"] = color
 
     if isinstance(linewidth, np.ndarray):
         if linewidth.shape != grid.shape:
-            raise ValueError(
-                "If 'linewidth' is given, must have the shape of 'Grid(x,y)'")
-        line_kw['linewidth'] = []
+            raise ValueError("If 'linewidth' is given, must have the shape of 'Grid(x,y)'")
+        line_kw["linewidth"] = []
     else:
-        line_kw['linewidth'] = linewidth
+        line_kw["linewidth"] = linewidth
 
-    line_kw['zorder'] = zorder
+    line_kw["zorder"] = zorder
 
     # Sanity checks.
     if u.shape != grid.shape or v.shape != grid.shape:
@@ -158,8 +159,7 @@ def nematic_plot(x,
     u = np.ma.masked_invalid(u)
     v = np.ma.masked_invalid(v)
 
-    integrate = get_integrator(u, v, dmap, minlength, maxlength,
-                               integration_direction)
+    integrate = get_integrator(u, v, dmap, minlength, maxlength, integration_direction)
 
     trajectories = []
     if start_points is None:
@@ -174,10 +174,13 @@ def nematic_plot(x,
 
         # Check if start_points are outside the data boundaries
         for xs, ys in sp2:
-            if not (grid.x_origin <= xs <= grid.x_origin + grid.width
-                    and grid.y_origin <= ys <= grid.y_origin + grid.height):
-                raise ValueError("Starting point ({}, {}) outside of data "
-                                 "boundaries".format(xs, ys))
+            if not (
+                grid.x_origin <= xs <= grid.x_origin + grid.width
+                and grid.y_origin <= ys <= grid.y_origin + grid.height
+            ):
+                raise ValueError(
+                    "Starting point ({}, {}) outside of data boundaries".format(xs, ys)
+                )
 
         # Convert start_points from data to array coords
         # Shift the seed points from the bottom left of the data so that
@@ -195,7 +198,7 @@ def nematic_plot(x,
         if norm is None:
             norm = mcolors.Normalize(color.min(), color.max())
         if cmap is None:
-            cmap = cm.get_cmap(matplotlib.rcParams['image.cmap'])
+            cmap = cm.get_cmap(matplotlib.rcParams["image.cmap"])
         else:
             cmap = cm.get_cmap(cmap)
 
@@ -213,15 +216,13 @@ def nematic_plot(x,
 
         if isinstance(linewidth, np.ndarray):
             line_widths = interpgrid(linewidth, tgx, tgy)[:-1]
-            line_kw['linewidth'].extend(line_widths)
+            line_kw["linewidth"].extend(line_widths)
 
         if use_multicolor_lines:
             color_values = interpgrid(color, tgx, tgy)[:-1]
             line_colors.append(color_values)
 
-    lc = mcollections.LineCollection(streamlines,
-                                     transform=transform,
-                                     **line_kw)
+    lc = mcollections.LineCollection(streamlines, transform=transform, **line_kw)
     lc.sticky_edges.x[:] = [grid.x_origin, grid.x_origin + grid.width]
     lc.sticky_edges.y[:] = [grid.y_origin, grid.y_origin + grid.height]
     if use_multicolor_lines:
@@ -261,6 +262,7 @@ class DomainMap(object):
     crossed by a given trajectory. Later, if you decide the trajectory is bad
     (e.g., if the trajectory is very short) just call `undo_trajectory`.
     """
+
     def __init__(self, grid, mask):
         self.grid = grid
         self.mask = mask
@@ -268,16 +270,15 @@ class DomainMap(object):
         self.x_grid2mask = (mask.nx - 1) / grid.nx
         self.y_grid2mask = (mask.ny - 1) / grid.ny
 
-        self.x_mask2grid = 1. / self.x_grid2mask
-        self.y_mask2grid = 1. / self.y_grid2mask
+        self.x_mask2grid = 1.0 / self.x_grid2mask
+        self.y_mask2grid = 1.0 / self.y_grid2mask
 
-        self.x_data2grid = 1. / grid.dx
-        self.y_data2grid = 1. / grid.dy
+        self.x_data2grid = 1.0 / grid.dx
+        self.y_data2grid = 1.0 / grid.dy
 
     def grid2mask(self, xi, yi):
         """Return nearest space in mask-coords from given grid-coords."""
-        return (int((xi * self.x_grid2mask) + 0.5),
-                int((yi * self.y_grid2mask) + 0.5))
+        return (int((xi * self.x_grid2mask) + 0.5), int((yi * self.y_grid2mask) + 0.5))
 
     def mask2grid(self, xm, ym):
         return xm * self.x_mask2grid, ym * self.y_mask2grid
@@ -308,6 +309,7 @@ class DomainMap(object):
 
 class Grid(object):
     """Grid of data."""
+
     def __init__(self, x, y):
 
         if x.ndim == 1:
@@ -361,6 +363,7 @@ class StreamMask(object):
     When a streamline enters a cell, that cell is set to 1, and no new
     streamlines are allowed to enter.
     """
+
     def __init__(self, density):
         if np.isscalar(density):
             if density <= 0:
@@ -429,7 +432,7 @@ def get_integrator(u, v, dmap, minlength, maxlength, integration_direction):
         ds_dt = interpgrid(speed, xi, yi)
         if ds_dt == 0:
             raise TerminateTrajectory()
-        dt_ds = 1. / ds_dt
+        dt_ds = 1.0 / ds_dt
         ui, vi = interpgrid_vec(u, v, xi, yi)
         # vi = interpgrid_vec(v, xi, yi)
 
@@ -450,19 +453,19 @@ def get_integrator(u, v, dmap, minlength, maxlength, integration_direction):
         resulting trajectory is None if it is shorter than `minlength`.
         """
 
-        stotal, x_traj, y_traj = 0., [], []
+        stotal, x_traj, y_traj = 0.0, [], []
 
         try:
             dmap.start_trajectory(x0, y0)
         except InvalidIndexError:
             return None
-        if integration_direction in ['both', 'backward']:
+        if integration_direction in ["both", "backward"]:
             s, xt, yt = _integrate_rk12(x0, y0, dmap, backward_time, maxlength)
             stotal += s
             x_traj += xt[::-1]
             y_traj += yt[::-1]
 
-        if integration_direction in ['both', 'forward']:
+        if integration_direction in ["both", "forward"]:
             dmap.reset_start_point(x0, y0)
             s, xt, yt = _integrate_rk12(x0, y0, dmap, forward_time, maxlength)
             if len(x_traj) > 0:
@@ -516,7 +519,7 @@ def _integrate_rk12(x0, y0, dmap, f, maxlength):
     # increment the location gradually. However, due to the efficient
     # nature of the interpolation, this doesn't boost speed by much
     # for quite a bit of complexity.
-    maxds = min(1. / dmap.mask.nx, 1. / dmap.mask.ny, 0.1)
+    maxds = min(1.0 / dmap.mask.nx, 1.0 / dmap.mask.ny, 0.1)
 
     ds = maxds
     stotal = 0
@@ -538,8 +541,7 @@ def _integrate_rk12(x0, y0, dmap, f, maxlength):
             # Out of the domain on one of the intermediate integration steps.
             # Take an Euler step to the boundary to improve neatness.
 
-            ds, xf_traj, yf_traj = _euler_step(xf_traj, yf_traj, dmap, f,
-                                               tangent)
+            ds, xf_traj, yf_traj = _euler_step(xf_traj, yf_traj, dmap, f, tangent)
             stotal += ds
             break
         except TerminateTrajectory:
@@ -552,7 +554,7 @@ def _integrate_rk12(x0, y0, dmap, f, maxlength):
 
         nx, ny = dmap.grid.shape
         # Error is normalized to the axes coordinates
-        error = np.sqrt(((dx2 - dx1) / nx)**2 + ((dy2 - dy1) / ny)**2)
+        error = np.sqrt(((dx2 - dx1) / nx) ** 2 + ((dy2 - dy1) / ny) ** 2)
 
         # Only save step if within error tolerance
         if error < maxerror:
@@ -575,7 +577,7 @@ def _integrate_rk12(x0, y0, dmap, f, maxlength):
         if error == 0:
             ds = maxds
         else:
-            ds = min(maxds, 0.85 * ds * (maxerror / error)**0.5)
+            ds = min(maxds, 0.85 * ds * (maxerror / error) ** 0.5)
 
     return stotal, xf_traj, yf_traj
 
@@ -752,28 +754,27 @@ def _gen_starting_points(shape):
     ylast = ny - 1
     x, y = 0, 0
     i = 0
-    direction = 'right'
+    direction = "right"
     for i in range(nx * ny):
-
         yield x, y
 
-        if direction == 'right':
+        if direction == "right":
             x += 1
             if x >= xlast:
                 xlast -= 1
-                direction = 'up'
-        elif direction == 'up':
+                direction = "up"
+        elif direction == "up":
             y += 1
             if y >= ylast:
                 ylast -= 1
-                direction = 'left'
-        elif direction == 'left':
+                direction = "left"
+        elif direction == "left":
             x -= 1
             if x <= xfirst:
                 xfirst += 1
-                direction = 'down'
-        elif direction == 'down':
+                direction = "down"
+        elif direction == "down":
             y -= 1
             if y <= yfirst:
                 yfirst += 1
-                direction = 'right'
+                direction = "right"

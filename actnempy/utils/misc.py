@@ -18,6 +18,7 @@ try:
 except ImportError:
     no_rng = True
 
+
 def denoise(arr):
     """
     denoise(arr)
@@ -43,15 +44,16 @@ def denoise(arr):
 
     # Compute SVD
     shape = arr.shape
-    arr = arr.reshape(np.prod(shape[:-1]),shape[-1])
-    n,m = arr.shape
-    (U,S,V) = LA.svd(arr, full_matrices=False)
-    dim = np.count_nonzero(S > (optimal_SVHT_coef([m/n],0) * np.median(S)))
+    arr = arr.reshape(np.prod(shape[:-1]), shape[-1])
+    n, m = arr.shape
+    (U, S, V) = LA.svd(arr, full_matrices=False)
+    dim = np.count_nonzero(S > (optimal_SVHT_coef([m / n], 0) * np.median(S)))
 
     print(f"Optimal threshold for array = {dim}")
 
-    denoised_arr = (U[:,:dim].dot(np.diag(S[:dim]).dot(V[:dim,:]))).reshape(shape)
+    denoised_arr = (U[:, :dim].dot(np.diag(S[:dim]).dot(V[:dim, :]))).reshape(shape)
     return (denoised_arr, S, dim)
+
 
 def add_noise(arr, noise_strength=0.01, seed=None):
     """
@@ -104,20 +106,19 @@ def add_noise(arr, noise_strength=0.01, seed=None):
     """
 
     if no_rng:
-
-        print('Using random.randn')
+        print("Using random.randn")
 
         np.random.seed(seed)
 
         return arr + noise_strength * np.std(arr) * np.random.randn(*arr.shape)
 
     else:
-
         rg = default_rng(seed)
 
         return arr + noise_strength * np.std(arr) * rg.standard_normal(arr.shape)
 
-def compute_Q(theta,sigma=1,custom_kernel=None):
+
+def compute_Q(theta, sigma=1, custom_kernel=None):
     """
     compute_Q(theta,sigma=1,custom_kernel=None)
 
@@ -150,26 +151,26 @@ def compute_Q(theta,sigma=1,custom_kernel=None):
         Values of Qxy
     """
 
-    average = lambda f : gaussian_filter(f, sigma=sigma)
+    average = lambda f: gaussian_filter(f, sigma=sigma)
     if custom_kernel is not None:
         if no_cv2:
             print("cv2 module not available.")
             print("Cannot generate custom kernel. Using default kernel...")
         else:
-            average = lambda f : cv2.filter2D(f,-1,custom_kernel)
-
+            average = lambda f: cv2.filter2D(f, -1, custom_kernel)
 
     nx = np.cos(theta)
     ny = np.sin(theta)
-    mQxx = (nx**2 - 0.5)
-    mQxy = (nx*ny)
+    mQxx = nx**2 - 0.5
+    mQxy = nx * ny
 
     Qxx = average(mQxx)
     Qxy = average(mQxy)
-    S = 2*np.sqrt( Qxx**2 + Qxy**2)
-    return (S,Qxx,Qxy)
+    S = 2 * np.sqrt(Qxx**2 + Qxy**2)
+    return (S, Qxx, Qxy)
 
-def compute_n(Qxx,Qxy):
+
+def compute_n(Qxx, Qxy):
     """
     compute_n(Qxx,Qxy)
 
@@ -194,21 +195,22 @@ def compute_n(Qxx,Qxy):
         Values of ny such that 0 <= ny <= 1.
         This ensures 0 <= theta <= pi
     """
-    S = 2*np.sqrt( Qxx**2 + Qxy**2)
-    Qxx = Qxx/S
-    Qxy = Qxy/S
+    S = 2 * np.sqrt(Qxx**2 + Qxy**2)
+    Qxx = Qxx / S
+    Qxy = Qxy / S
 
     # Evaluate nx and ny from normalized Qxx and Qxy
-    nx = np.sqrt( Qxx + 0.5 )
+    nx = np.sqrt(Qxx + 0.5)
     with warnings.catch_warnings(record=True) as wrng:
-        ny = np.abs( Qxy / nx ) # This ensures ny>0, such that theta lies between 0 to pi
-    if len(wrng)>0:
-        ny[nx==0] = 1.0 # RuntimeWarning will appear if nx is exactly zero.
-    nx = nx * np.sign( Qxy ) # This gives back nx its correct sign.
+        ny = np.abs(Qxy / nx)  # This ensures ny>0, such that theta lies between 0 to pi
+    if len(wrng) > 0:
+        ny[nx == 0] = 1.0  # RuntimeWarning will appear if nx is exactly zero.
+    nx = nx * np.sign(Qxy)  # This gives back nx its correct sign.
     return (S, nx, ny)
 
+
 def remove_NaNs(field, nematic=False):
-    '''
+    """
     remove_NaNs(field, nematic=True)
 
     Function to remove (*in place*) spurious NaNs appearing in the field data. This
@@ -234,24 +236,25 @@ def remove_NaNs(field, nematic=False):
     -------
     None (The array is changed in place.)
 
-    '''
-    (nx,ny) = field.shape
+    """
+    (nx, ny) = field.shape
     ids = np.argwhere(np.isnan(field))
-    offsets = [[1,0],[0,1],[-1,0],[0,-1]]
+    offsets = [[1, 0], [0, 1], [-1, 0], [0, -1]]
     for pos in ids:
-        bdy_ids = (pos+offsets).T
-        bdy_ids[0,:] = np.clip(bdy_ids[0,:], 0, nx-1)
-        bdy_ids[1,:] = np.clip(bdy_ids[1,:], 0, ny-1)
+        bdy_ids = (pos + offsets).T
+        bdy_ids[0, :] = np.clip(bdy_ids[0, :], 0, nx - 1)
+        bdy_ids[1, :] = np.clip(bdy_ids[1, :], 0, ny - 1)
         bdys = field[tuple(bdy_ids)]
         if nematic:
             # This means that the field is an orientation field of a nematic,
             # meaning, -pi/2 <= field <= pi/2. Hence, the interpolation for
             # this field needs to be handled carefully, taking into account
             # the periodicity and the nematic symmetry.
-            c2th, s2th = np.nanmean(np.cos(2*bdys)), np.nanmean(np.sin(2*bdys))
-            field[tuple(pos)] = 0.5*np.arctan2(s2th, c2th)
+            c2th, s2th = np.nanmean(np.cos(2 * bdys)), np.nanmean(np.sin(2 * bdys))
+            field[tuple(pos)] = 0.5 * np.arctan2(s2th, c2th)
         else:
             field[tuple(pos)] = np.nanmean(bdys)
+
 
 def count_NaNs(arr):
     """
@@ -269,10 +272,11 @@ def count_NaNs(arr):
     num : int
         Number of NaNs in the array
     """
-    return (np.count_nonzero(np.isnan(arr)))
+    return np.count_nonzero(np.isnan(arr))
+
 
 def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
-    '''
+    """
     get_random_sample(shp, num_points, box_size, diff_order, seed=1)
 
     Function to sample random boxes out of a 3D array of shape `shp`.
@@ -306,20 +310,19 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
             u_view = u_all[view].copy()
             ...
 
-    '''
+    """
     if isinstance(box_size, int):
         if box_size < 0:
-            raise ValueError(
-                "Box size has to be greater than equal to zero!")
+            raise ValueError("Box size has to be greater than equal to zero!")
         box_size = (box_size,) * len(shp)
 
-    n_diff = 2 * np.ceil(diff_order/2.0)
+    n_diff = 2 * np.ceil(diff_order / 2.0)
 
-    window = tuple([int(i+n_diff) for i in box_size])
+    window = tuple([int(i + n_diff) for i in box_size])
 
-    bdy = tuple([int((i+1)/2) for i in window])
+    bdy = tuple([int((i + 1) / 2) for i in window])
 
-    box_bdy = tuple([int((i+1)/2) for i in box_size])
+    box_bdy = tuple([int((i + 1) / 2) for i in box_size])
 
     # Now sample random points that lie between bdy and shp-bdy.
     # To speed things up, we will sample random points in each x, y and
@@ -330,38 +333,39 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
 
     if no_rng:
         np.random.seed(seed)
-        pts_x = np.random.randint(bdy[0],shp[0]-bdy[0],int(1.5*num_points))
-        pts_y = np.random.randint(bdy[1],shp[1]-bdy[1],int(1.5*num_points))
-        pts_z = np.random.randint(bdy[2],shp[2]-bdy[2],int(1.5*num_points))
+        pts_x = np.random.randint(bdy[0], shp[0] - bdy[0], int(1.5 * num_points))
+        pts_y = np.random.randint(bdy[1], shp[1] - bdy[1], int(1.5 * num_points))
+        pts_z = np.random.randint(bdy[2], shp[2] - bdy[2], int(1.5 * num_points))
 
     else:
         rg = default_rng(seed)
-        pts_x = rg.integers(bdy[0],shp[0]-bdy[0],int(1.5*num_points))
-        pts_y = rg.integers(bdy[1],shp[1]-bdy[1],int(1.5*num_points))
-        pts_z = rg.integers(bdy[2],shp[2]-bdy[2],int(1.5*num_points))
+        pts_x = rg.integers(bdy[0], shp[0] - bdy[0], int(1.5 * num_points))
+        pts_y = rg.integers(bdy[1], shp[1] - bdy[1], int(1.5 * num_points))
+        pts_z = rg.integers(bdy[2], shp[2] - bdy[2], int(1.5 * num_points))
 
-    picked_points = np.unique( np.array([pts_x,pts_y,pts_z]), axis=1)[:,:num_points]
+    picked_points = np.unique(np.array([pts_x, pts_y, pts_z]), axis=1)[:, :num_points]
 
     # In the ultra-rare case that this gives less than `num_points`
     # number of points, the program should break, asking either for a
     # different seed or for lesser number of points.
-    if picked_points.shape[1]<num_points:
-        raise ValueError("Couldn't sample enough number of unique points! Try a different seed for `get_random_sample` or try lesser number of points.")
+    if picked_points.shape[1] < num_points:
+        raise ValueError(
+            "Couldn't sample enough number of unique points! Try a different seed for `get_random_sample` or try lesser number of points."
+        )
 
     points = {}
     views = {}
 
     for count in range(num_points):
-        points[count] = [picked_points[0][count],
-                         picked_points[1][count], picked_points[2][count]]
-        views[count] = (slice(points[count][0]-bdy[0]+1, points[count][0]+bdy[0]),
-                        slice(points[count][1]-bdy[1]+1,
-                              points[count][1]+bdy[1]),
-                        slice(points[count][2]-bdy[2] +
-                              1, points[count][2]+bdy[2])
-                        )
+        points[count] = [picked_points[0][count], picked_points[1][count], picked_points[2][count]]
+        views[count] = (
+            slice(points[count][0] - bdy[0] + 1, points[count][0] + bdy[0]),
+            slice(points[count][1] - bdy[1] + 1, points[count][1] + bdy[1]),
+            slice(points[count][2] - bdy[2] + 1, points[count][2] + bdy[2]),
+        )
 
     return points, views
+
 
 if __name__ == "__main__":
     pass

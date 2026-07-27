@@ -1,4 +1,4 @@
-'''
+"""
 
 Active Nematic Identification of Sparse Equations (ANISE)
 
@@ -11,7 +11,7 @@ the result of the sparse identification framework. In addition, it provides
 some modifications of the functions available in the original PDE-FIND framework.
 
 
-'''
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,7 +20,8 @@ import warnings
 from ..utils.grid import Grid
 from sklearn.metrics import r2_score
 
-def HRidge(X0, y, lam, normalize = 2):
+
+def HRidge(X0, y, lam, normalize=2):
     """
     (w_all, r2) = HRidge(X0, y, lam, normalize = 2)
 
@@ -63,42 +64,46 @@ def HRidge(X0, y, lam, normalize = 2):
 
     """
 
-    n,d = X0.shape
+    n, d = X0.shape
     # Allocating memory for all the heirarchical solutions
     w_all = np.zeros([d, d], dtype=np.complex64)
     r2 = np.zeros(d)
     X = np.zeros((n, d), dtype=np.complex64)
     # First normalize data
     if normalize != 0:
-        Mreg = np.zeros((d,1))
-        for i in range(0,d):
-            Mreg[i] = 1.0/(np.linalg.norm(X0[:,i],normalize))
-            X[:,i] = Mreg[i]*X0[:,i]
-    else: X = X0
+        Mreg = np.zeros((d, 1))
+        for i in range(0, d):
+            Mreg[i] = 1.0 / (np.linalg.norm(X0[:, i], normalize))
+            X[:, i] = Mreg[i] * X0[:, i]
+    else:
+        X = X0
 
     # Get the standard ridge esitmate
-    if lam != 0: w = np.linalg.lstsq(X.T.dot(X) + lam*np.eye(d), X.T.dot(y), rcond=None )[0]
-    else: w = np.linalg.lstsq(X,y, rcond=None)[0]
+    if lam != 0:
+        w = np.linalg.lstsq(X.T.dot(X) + lam * np.eye(d), X.T.dot(y), rcond=None)[0]
+    else:
+        w = np.linalg.lstsq(X, y, rcond=None)[0]
 
     # biginds = np.where( abs(w) > np.min(abs(w)))[0]
     # w_all[0] = w.flatten().copy()
     # print(np.linalg.lstsq(X,y, rcond=None)[0].flatten().shape)
-    w_all[0] = np.linalg.lstsq(X,y, rcond=None)[0].flatten() # The solution with all the terms included is just least squares
+    w_all[0] = np.linalg.lstsq(X, y, rcond=None)[
+        0
+    ].flatten()  # The solution with all the terms included is just least squares
 
     # Threshold and continue
     lhs = np.squeeze(np.real(y))
 
     if normalize != 0:
-            wr = np.multiply(Mreg, w)
-            w_all[0] = np.multiply(Mreg, w_all[0][:, np.newaxis]).flatten()
+        wr = np.multiply(Mreg, w)
+        w_all[0] = np.multiply(Mreg, w_all[0][:, np.newaxis]).flatten()
     else:
         wr = w.copy()
     rhs = np.squeeze(np.real(X0.dot(wr)))
 
     r2[0] = r2_score(lhs, rhs)
 
-    for j in range(1,d):
-
+    for j in range(1, d):
         # Figure out the position of the term with the smallest coefficient
         smallid = np.where(abs(w) <= np.min(abs(w[np.nonzero(w)])))[0]
         biginds = [i for i in range(d) if i not in smallid]
@@ -113,13 +118,20 @@ def HRidge(X0, y, lam, normalize = 2):
 
         r2[j] = r2_score(lhs, rhs)
 
-        if lam != 0: w[biginds] = np.linalg.lstsq(X[:, biginds].T.dot(X[:, biginds]) + lam*np.eye(len(biginds)),X[:, biginds].T.dot(y), rcond=None)[0]
-        else: w[biginds] = np.linalg.lstsq(X[:, biginds],y, rcond=None)[0]
+        if lam != 0:
+            w[biginds] = np.linalg.lstsq(
+                X[:, biginds].T.dot(X[:, biginds]) + lam * np.eye(len(biginds)),
+                X[:, biginds].T.dot(y),
+                rcond=None,
+            )[0]
+        else:
+            w[biginds] = np.linalg.lstsq(X[:, biginds], y, rcond=None)[0]
 
     return (w_all, r2)
 
+
 def kfold_cv(X, y, k=10):
-    '''
+    """
     (w_all_train, r2train, r2test, variance) = kfold_cv(X, y, k=10)
 
     Perform k-fold cross validation (CV) for the PDE fit found using the
@@ -166,55 +178,54 @@ def kfold_cv(X, y, k=10):
         contains the same m terms at the m-th level of sparsity across all the
         k-folds, then variance is False (0), else it is True (1).
 
-    '''
+    """
 
-    n = y.shape[0] # Total number of data-points
+    n = y.shape[0]  # Total number of data-points
     nparameters = X.shape[1]
 
     rng = np.random.default_rng()
     ids = np.arange(n)
     rng.shuffle(ids)
-    X = X[ids,:]
-    y = y[ids,:]
+    X = X[ids, :]
+    y = y[ids, :]
 
-    if n<k*nparameters:
-        k = np.floor(n/nparameters).astype(int)
+    if n < k * nparameters:
+        k = np.floor(n / nparameters).astype(int)
         print("k is too large for the amount of data present...")
         print(f"Switching to k={k}")
-    m = np.round(n/k).astype(int) # Rough number of data-points in each subsample
+    m = np.round(n / k).astype(int)  # Rough number of data-points in each subsample
 
     ids = np.arange(n)
     ids = ids[::m]
-    ids = np.append(ids,n)
+    ids = np.append(ids, n)
 
     r2train = np.zeros([k, nparameters])
     r2test = np.zeros([k, nparameters])
-    w_all_train = np.zeros([k,nparameters,nparameters], dtype=np.complex128)
+    w_all_train = np.zeros([k, nparameters, nparameters], dtype=np.complex128)
     for i in range(k):
-        subsample = slice(ids[i],ids[i+1])
+        subsample = slice(ids[i], ids[i + 1])
         Xtrain = np.delete(X, subsample, axis=0)
         ytrain = np.delete(y, subsample, axis=0)
 
-        Xtest = X[subsample,:].copy()
+        Xtest = X[subsample, :].copy()
         ytest = y[subsample].copy()
 
-        (w_all_train[i], r2train[i]) = HRidge(Xtrain,ytrain,10**-5)
+        (w_all_train[i], r2train[i]) = HRidge(Xtrain, ytrain, 10**-5)
 
         lhs_test = np.squeeze(np.real(ytest))
 
         for j in range(nparameters):
+            rhs_test = np.squeeze(np.real(Xtest.dot(w_all_train[i, j])))
 
-            rhs_test = np.squeeze(np.real(Xtest.dot(w_all_train[i,j])))
+            r2test[i, j] = r2_score(lhs_test, rhs_test)
 
-            r2test[i,j] = r2_score(lhs_test, rhs_test)
-
-    n_terms = np.arange(1,nparameters+1)
-    variance = (np.count_nonzero(np.prod(w_all_train,axis=0),axis=1) - np.flipud(n_terms))!=0
+    n_terms = np.arange(1, nparameters + 1)
+    variance = (np.count_nonzero(np.prod(w_all_train, axis=0), axis=1) - np.flipud(n_terms)) != 0
     return (w_all_train, r2train, r2test, variance)
 
 
-def print_pde(w, rhs_description, ut='u_t'):
-    '''
+def print_pde(w, rhs_description, ut="u_t"):
+    """
     print_pde(w, rhs_description, ut = 'u_t')
 
     Function to print the PDE model from a coefficient vector `w` and
@@ -238,19 +249,20 @@ def print_pde(w, rhs_description, ut='u_t'):
 
     None
 
-    '''
-    pde = ut + ' =   '
+    """
+    pde = ut + " =   "
     first = True
     for i in range(len(w)):
         if w[i] != 0:
             if not first:
-                pde = pde + len(ut)*' ' + '+ '
+                pde = pde + len(ut) * " " + "+ "
             pde = pde + "(%g) " % w[i].real + rhs_description[i] + "\n   "
             first = False
     print(pde)
 
+
 class PDE:
-    '''
+    """
 
     This class is designed to conveniently analyze the result of the
     sparse identification framework.
@@ -281,23 +293,23 @@ class PDE:
         sparsity. Default is set to 10**-5. ridge_lam = 0 implies least squares.
 
 
-    '''
+    """
+
     def __init__(self, filename=None):
 
         self.grid = Grid(h=1, ndims=1)
 
-        self.ut = "u_t" # Default value
+        self.ut = "u_t"  # Default value
 
         if filename is not None:
-
             self.load(filename)
 
             self._calculate_quantities()
 
     def compute(self, rhs, lhs, ut, metadata, ridge_lam=10**-5):
 
-        num_windows = metadata['num_windows']
-        window_size = metadata['window_size']
+        num_windows = metadata["num_windows"]
+        window_size = metadata["window_size"]
 
         try:
             k = metadata["k"]
@@ -310,23 +322,25 @@ class PDE:
         self.lam = ridge_lam
         self.y = get_term_val(lhs, ut)
         try:
-            self.ya = np.mean(self.y.reshape(num_windows,window_size**3),axis=-1)[:,np.newaxis]
+            self.ya = np.mean(self.y.reshape(num_windows, window_size**3), axis=-1)[:, np.newaxis]
         except ValueError:
-            self.ya = self.y[:,np.newaxis]
-        self.desc = list(rhs['name'])
-        self.X = rhs['val']
+            self.ya = self.y[:, np.newaxis]
+        self.desc = list(rhs["name"])
+        self.X = rhs["val"]
 
         self.nt = self.X.shape[0]
         try:
-            self.Xa = np.mean(self.X.reshape(self.nt,num_windows,window_size**3),axis=-1).T
+            self.Xa = np.mean(self.X.reshape(self.nt, num_windows, window_size**3), axis=-1).T
         except ValueError:
             self.Xa = self.X.T
 
         # Using HRidge to get the heirarchy of models
-        (self.w_all, self.r2) = HRidge(self.Xa,self.ya,self.lam)
+        (self.w_all, self.r2) = HRidge(self.Xa, self.ya, self.lam)
 
         # Independently, doing the same with k-fold cross-validation
-        (self.w_all_train, self.r2train, self.r2test, self.variance) = kfold_cv(self.Xa, self.ya, k=k)
+        (self.w_all_train, self.r2train, self.r2test, self.variance) = kfold_cv(
+            self.Xa, self.ya, k=k
+        )
 
         self.variance = np.flipud(self.variance)
         self._calculate_quantities()
@@ -352,18 +366,18 @@ class PDE:
         self.r2test_max = np.max(self.r2train, axis=0)
 
         # Number of terms goes from 1 to n
-        self.n_terms = np.arange(1, len(self.r2)+1)
+        self.n_terms = np.arange(1, len(self.r2) + 1)
         # Fraction of Variance Unexplained (FVU). The indices of r2 start with
         # the densest model and down to the sparsest, so we use flipud
-        self.fvu = np.flipud(1-self.r2)
-        self.fvu_mean = np.flipud(1-self.r2train_avg)
-        self.fvu_min = np.flipud(1-self.r2train_max)
-        self.fvu_max = np.flipud(1-self.r2train_min)
+        self.fvu = np.flipud(1 - self.r2)
+        self.fvu_mean = np.flipud(1 - self.r2train_avg)
+        self.fvu_min = np.flipud(1 - self.r2train_max)
+        self.fvu_max = np.flipud(1 - self.r2train_min)
         self.fvu_err = np.array([self.fvu_min, self.fvu_max])
 
-        self.fvut_mean = np.flipud(1-self.r2test_avg)
-        self.fvut_min = np.flipud(1-self.r2test_max)
-        self.fvut_max = np.flipud(1-self.r2test_min)
+        self.fvut_mean = np.flipud(1 - self.r2test_avg)
+        self.fvut_min = np.flipud(1 - self.r2test_max)
+        self.fvut_max = np.flipud(1 - self.r2test_min)
         self.fvut_err = np.array([self.fvut_min, self.fvut_max])
 
         # self.variance = np.flipud(self.variance)
@@ -378,9 +392,8 @@ class PDE:
         print("Optimal model: ")
         self.display_model(self.nopt)
 
-
     def save(self, path):
-        '''
+        """
 
         save(path)
 
@@ -397,16 +410,17 @@ class PDE:
         -------
         None.
 
-        '''
-        np.savez(path,
-                 w_all = self.w_all,
-                 w_all_train = self.w_all_train,
-                 r2 = self.r2,
-                 r2train = self.r2train,
-                 r2test = self.r2test,
-                 variance = self.variance,
-                 desc = self.desc,
-                 )
+        """
+        np.savez(
+            path,
+            w_all=self.w_all,
+            w_all_train=self.w_all_train,
+            r2=self.r2,
+            r2train=self.r2train,
+            r2test=self.r2test,
+            variance=self.variance,
+            desc=self.desc,
+        )
 
     def load(self, filename):
 
@@ -423,8 +437,8 @@ class PDE:
         except KeyError:
             print(f"Some keys not found. The PDE isn't saved properly!")
 
-    def plot_fvu(self,nterms=None,var='var',filename=None):
-        '''
+    def plot_fvu(self, nterms=None, var="var", filename=None):
+        """
         plot_fvu()
 
         Generate a plot of FVU (Fraction of Variance Unexplained) vs number of
@@ -447,33 +461,33 @@ class PDE:
         -------
         None.
 
-        '''
+        """
         if nterms is None:
             nterms = self.nt
         if var is None:
-            var = 'var'
+            var = "var"
         # Get the default figsize meant for PRX half-column figures
         [fig_width, fig_height] = plt.rcParams["figure.figsize"]
         # Generate figure for full column
-        fig = plt.figure(figsize=(fig_width, 0.6*fig_height))
-        plt.semilogy(self.n_terms,self.fvu,'o-')
-        plt.xlabel('Number of non-zero terms')
-        plt.ylabel(r'$1 - R^2$')
-        plt.xlim([0,nterms+0.5])
+        fig = plt.figure(figsize=(fig_width, 0.6 * fig_height))
+        plt.semilogy(self.n_terms, self.fvu, "o-")
+        plt.xlabel("Number of non-zero terms")
+        plt.ylabel(r"$1 - R^2$")
+        plt.xlim([0, nterms + 0.5])
         ax = plt.gca()
         ax.tick_params(direction="in")
-        ax.tick_params(which="minor",direction="in")
+        ax.tick_params(which="minor", direction="in")
         plt.tight_layout()
         if filename is None:
-            filename = f'{self.metadata["data_dir"]}/fvu_{var}_nterms_{nterms}'
-        fig.savefig(f"{filename}.png",dpi=300)
-        fig.savefig(f"{filename}.svg",dpi=300)
-        fig.savefig(f"{filename}.pdf",dpi=300)
+            filename = f"{self.metadata['data_dir']}/fvu_{var}_nterms_{nterms}"
+        fig.savefig(f"{filename}.png", dpi=300)
+        fig.savefig(f"{filename}.svg", dpi=300)
+        fig.savefig(f"{filename}.pdf", dpi=300)
 
         plt.show()
 
-    def plot_fvu_kfold(self,nterms=None,var='var',filename=None):
-        '''
+    def plot_fvu_kfold(self, nterms=None, var="var", filename=None):
+        """
         plot_fvu_kfold()
 
         Generate a plot of average FVU (Fraction of Variance
@@ -499,40 +513,46 @@ class PDE:
         -------
         None.
 
-        '''
+        """
         if nterms is None:
             nterms = self.nt
         if var is None:
-            var = 'var'
+            var = "var"
         [fig_width, fig_height] = plt.rcParams["figure.figsize"]
         # Generate figure for full column
-        fig = plt.figure(figsize=(fig_width, 0.5*fig_height))
+        fig = plt.figure(figsize=(fig_width, 0.5 * fig_height))
         # fig = plt.figure()
-        zv = self.variance==0 # ids with zero variance
+        zv = self.variance == 0  # ids with zero variance
 
-        p1 = plt.errorbar(self.n_terms[zv], self.fvu_mean[zv],
-                          yerr=self.fvu_err[:, zv], fmt='o', color='tab:blue')
-        p2 = plt.errorbar(self.n_terms[~zv], self.fvu_mean[~zv],
-                          yerr=self.fvu_err[:, ~zv], fmt='^', color='tab:blue')
+        p1 = plt.errorbar(
+            self.n_terms[zv], self.fvu_mean[zv], yerr=self.fvu_err[:, zv], fmt="o", color="tab:blue"
+        )
+        p2 = plt.errorbar(
+            self.n_terms[~zv],
+            self.fvu_mean[~zv],
+            yerr=self.fvu_err[:, ~zv],
+            fmt="^",
+            color="tab:blue",
+        )
 
         # p3 = plt.errorbar(self.n_terms[zv],self.fvut_mean[zv],yerr=self.fvut_err[:,zv],fmt='o',color='tab:blue')
         # p4 = plt.errorbar(self.n_terms[~zv],self.fvut_mean[~zv],yerr=self.fvut_err[:,~zv],fmt='^',color='tab:blue')
-        yl,yh = plt.gca().get_ylim()
-        plt.yscale('log')
-        plt.xlabel('Number of non-zero terms')
-        plt.ylabel(r'$1 - R^2$')
+        yl, yh = plt.gca().get_ylim()
+        plt.yscale("log")
+        plt.xlabel("Number of non-zero terms")
+        plt.ylabel(r"$1 - R^2$")
 
         # plt.legend([p3,p4],['Indicates same model under cross-validation','Indicates different model under cross-validation'],scatterpoints=2)
-        plt.xlim([0,nterms+0.5])
+        plt.xlim([0, nterms + 0.5])
         plt.tight_layout()
         if filename is None:
-            filename = f'{self.metadata["data_dir"]}/fvu_paper_{var}_nterms_{nterms}_cv'
-        fig.savefig(f"{filename}.png",dpi=300)
-        fig.savefig(f"{filename}.pdf",dpi=300)
+            filename = f"{self.metadata['data_dir']}/fvu_paper_{var}_nterms_{nterms}_cv"
+        fig.savefig(f"{filename}.png", dpi=300)
+        fig.savefig(f"{filename}.pdf", dpi=300)
         plt.show()
 
-    def display_model(self,n=None):
-        '''
+    def display_model(self, n=None):
+        """
         display_model()
 
         Display the model at the optimal sparsity. An optional argument can be
@@ -549,7 +569,7 @@ class PDE:
         -------
         None.
 
-        '''
+        """
         if n is None:
             n = self.nopt
 
@@ -559,8 +579,8 @@ class PDE:
         print(f"Contains {np.count_nonzero(beta)}/{len(beta)} terms...")
         print_pde(beta, self.desc, self.ut)
 
-    def display_model_avg(self,n=None):
-        '''
+    def display_model_avg(self, n=None):
+        """
         display_model_avg()
 
         Display the model at the optimal sparsity, averaged across the k-folds.
@@ -578,7 +598,7 @@ class PDE:
         -------
         None.
 
-        '''
+        """
         if n is None:
             n = self.nopt
         self.idx = -n
@@ -588,20 +608,20 @@ class PDE:
         print_pde(self.beta, self.desc, self.ut)
 
     def hierarchy(self):
-        '''
+        """
         terms = hierarchy()
 
         Returns a list of terms in the order in which they first appear
         in the model heirarchy. For instance, terms[0] will contain the
         term at n=1, term[1] will contain the term at n=2 that is not
         present at n=1, and so on.
-        '''
+        """
         terms = []
         self.nt = len(self.desc)
-        for n in range(1, self.nt+1):
+        for n in range(1, self.nt + 1):
             idx = -n
             beta = self.w_all[idx]
-            loc = np.argwhere(beta!=0).flatten()
+            loc = np.argwhere(beta != 0).flatten()
             for id in loc:
                 term = self.desc[id]
                 if term not in terms:
@@ -609,6 +629,6 @@ class PDE:
 
         return terms
 
+
 if __name__ == "__main__":
     pass
-

@@ -1,9 +1,11 @@
-'''
+"""
 Functions and Classes for creating library of terms
-'''
+"""
+
 import itertools
 import numpy as np
 import copy
+
 
 class Function:
     def __init__(self, name, root=None, maxf=100, maxd=100):
@@ -16,14 +18,15 @@ class Function:
             self.root = self._name
         else:
             self.root = root
+
     @staticmethod
     def unity():
-        f = Function('1')
+        f = Function("1")
         f.func_order = 0
         f.diff_order = 0
         f.max_func_order = 0
         f.max_diff_order = 0
-        f.root = '1'
+        f.root = "1"
         return f
 
     def __repr__(self):
@@ -46,7 +49,7 @@ class MultiplyOp:
         self.func_order = lhs.func_order + rhs.func_order
 
     def __repr__(self):
-        return f"{self._lhs} \u00D7 {self._rhs}"
+        return f"{self._lhs} \u00d7 {self._rhs}"
 
     def __mul__(self, rhs):
         if self.func_order == 0:
@@ -77,14 +80,15 @@ class Derivative:
         self.root = f.root
         self.max_func_order = f.max_func_order
         self.max_diff_order = f.max_diff_order
+
     def __repr__(self):
         superscripts = {
-            0: '',
-            1: '',
-            2: '\u00B2',
-            3: '\u00B3',
+            0: "",
+            1: "",
+            2: "\u00b2",
+            3: "\u00b3",
         }
-        superscripts.update((n, chr(ord('\u2070') + n)) for n in range(4, 10))
+        superscripts.update((n, chr(ord("\u2070") + n)) for n in range(4, 10))
 
         # return f"Derivative({self._f}, {self._x}, {self._n})"
         numer = f"\u2202{superscripts[self._n]}{self._f}"
@@ -105,12 +109,16 @@ class Derivative:
         else:
             return MultiplyOp(rhs, self)
 
-def check_individual_constraints(term,funcs):
+
+def check_individual_constraints(term, funcs):
     out = True
     for func in funcs:
         termf = term[func.root]
-        out = out and ((termf.func_order <= func.max_func_order) and (termf.diff_order <= func.max_diff_order))
+        out = out and (
+            (termf.func_order <= func.max_func_order) and (termf.diff_order <= func.max_diff_order)
+        )
     return out
+
 
 def build_library_expr_with_base(funcs, ivars, constraints, base):
     """
@@ -124,7 +132,7 @@ def build_library_expr_with_base(funcs, ivars, constraints, base):
     """
 
     # np.empty([],dtype=data_base.dtype)
-    term_order = {'1': Function.unity()}
+    term_order = {"1": Function.unity()}
     for func in funcs:
         f = copy.deepcopy(func)
         f.func_order = 0
@@ -132,7 +140,7 @@ def build_library_expr_with_base(funcs, ivars, constraints, base):
         if f.root not in term_order:
             term_order[f.root] = f
 
-    for terms in itertools.combinations_with_replacement(base, constraints['func_order']):
+    for terms in itertools.combinations_with_replacement(base, constraints["func_order"]):
         term = terms[0]
         term_order[terms[0].root].func_order += terms[0].func_order
         term_order[terms[0].root].diff_order += terms[0].diff_order
@@ -141,14 +149,17 @@ def build_library_expr_with_base(funcs, ivars, constraints, base):
             term_order[multiplier.root].diff_order += multiplier.diff_order
             term = term * multiplier
 
-        if ( (term.func_order <= constraints['func_order'])
-                 and (term.diff_order <= constraints['diff_order'])
-                 and (check_individual_constraints(term_order,funcs) )):
+        if (
+            (term.func_order <= constraints["func_order"])
+            and (term.diff_order <= constraints["diff_order"])
+            and (check_individual_constraints(term_order, funcs))
+        ):
             yield term
 
         for func in funcs:
             term_order[func.root].func_order = 0
             term_order[func.root].diff_order = 0
+
 
 def build_library_expr(funcs, ivars, constraints):
     """
@@ -163,23 +174,23 @@ def build_library_expr(funcs, ivars, constraints):
 
     base = []
     # np.empty([],dtype=data_base.dtype)
-    term_order = {'1': Function.unity()}
+    term_order = {"1": Function.unity()}
     for func in funcs:
         f = copy.deepcopy(func)
         f.func_order = 0
         f.diff_order = 0
         if f.root not in term_order:
             term_order[f.root] = f
-    for vs in itertools.combinations_with_replacement(['1'] + ivars, constraints['diff_order']):
+    for vs in itertools.combinations_with_replacement(["1"] + ivars, constraints["diff_order"]):
         for f in funcs:
             for v in vs:
-                if v != '1':
+                if v != "1":
                     f = Derivative(f, v)
-            if f.diff_order <= constraints['diff_order'] and f.func_order > 0:
+            if f.diff_order <= constraints["diff_order"] and f.func_order > 0:
                 base.append(f)
 
     base.append(Function.unity())
-    for terms in itertools.combinations_with_replacement(base, constraints['func_order']):
+    for terms in itertools.combinations_with_replacement(base, constraints["func_order"]):
         term = terms[0]
         term_order[terms[0].root].func_order += terms[0].func_order
         term_order[terms[0].root].diff_order += terms[0].diff_order
@@ -188,14 +199,17 @@ def build_library_expr(funcs, ivars, constraints):
             term_order[multiplier.root].diff_order += multiplier.diff_order
             term = term * multiplier
 
-        if ( (term.func_order <= constraints['func_order'])
-                 and (term.diff_order <= constraints['diff_order'])
-                 and (check_individual_constraints(term_order,funcs) )):
+        if (
+            (term.func_order <= constraints["func_order"])
+            and (term.diff_order <= constraints["diff_order"])
+            and (check_individual_constraints(term_order, funcs))
+        ):
             yield term
 
         for func in funcs:
             term_order[func.root].func_order = 0
             term_order[func.root].diff_order = 0
+
 
 def build_base_expr(funcs, ivars, constraints):
     """
@@ -209,18 +223,23 @@ def build_base_expr(funcs, ivars, constraints):
     """
 
     base = []
-    for vs in itertools.combinations_with_replacement(['1'] + ivars, constraints['diff_order']):
+    for vs in itertools.combinations_with_replacement(["1"] + ivars, constraints["diff_order"]):
         for f in funcs:
             for v in vs:
-                if v != '1':
+                if v != "1":
                     f = Derivative(f, v)
-            if f.diff_order <= constraints['diff_order'] and f.func_order > 0 and f.diff_order <= f.max_diff_order:
+            if (
+                f.diff_order <= constraints["diff_order"]
+                and f.func_order > 0
+                and f.diff_order <= f.max_diff_order
+            ):
                 base.append(f)
 
     base.append(Function.unity())
     return base
 
-def get_term_val(lib,term):
+
+def get_term_val(lib, term):
     """
     get_term_val(lib,term):
 
@@ -239,16 +258,18 @@ def get_term_val(lib,term):
     arr : ndarray
         Array containing the values of the term
     """
-    return np.squeeze(lib[lib['name']==str(term)]['val'],axis=0)
+    return np.squeeze(lib[lib["name"] == str(term)]["val"], axis=0)
 
-def get_rhs(lib,w):
-    rhs_array = np.zeros_like(lib[0]['val'])
+
+def get_rhs(lib, w):
+    rhs_array = np.zeros_like(lib[0]["val"])
     for i in range(len(w)):
         if w[i] != 0:
-            rhs_array += w[i] * lib[i]['val']
+            rhs_array += w[i] * lib[i]["val"]
     return rhs_array
 
-def delete_term(lib,term):
+
+def delete_term(lib, term):
     """
     delete_term(lib,term):
 
@@ -269,10 +290,10 @@ def delete_term(lib,term):
             Library with the term deleted from it.
     """
 
-    return np.delete( lib, np.argwhere( lib['name']==str(term) ) )
+    return np.delete(lib, np.argwhere(lib["name"] == str(term)))
+
 
 def get_desc_and_X(library):
-
     """
     get_desc_and_X(lib):
 
@@ -295,28 +316,26 @@ def get_desc_and_X(library):
             such that the value of desc[0] is X[:,0]
     """
 
-    desc = list(library['name'])
-    X = library['val'].T
-    return ( desc, np.real(X) )
+    desc = list(library["name"])
+    X = library["val"].T
+    return (desc, np.real(X))
 
-def add_term(lib,term,term_val):
 
-    new_term_struct = np.array([(str(term),term_val)],
-                                dtype=lib.dtype)
+def add_term(lib, term, term_val):
 
-    return np.append(lib,new_term_struct)
+    new_term_struct = np.array([(str(term), term_val)], dtype=lib.dtype)
 
-def convert_to_lib_as_type(lib,term,term_val):
+    return np.append(lib, new_term_struct)
 
-    return np.array([(str(term),term_val)],
-                                dtype=lib.dtype)
 
-def build_constrained_library_array(funcs, base,
-                                    data_base, ivars,
-                                    constraints,
-                                    print_terms=False):
+def convert_to_lib_as_type(lib, term, term_val):
 
-    term_order = {'1': Function.unity()}
+    return np.array([(str(term), term_val)], dtype=lib.dtype)
+
+
+def build_constrained_library_array(funcs, base, data_base, ivars, constraints, print_terms=False):
+
+    term_order = {"1": Function.unity()}
     for func in funcs:
         f = copy.deepcopy(func)
         f.func_order = 0
@@ -325,32 +344,34 @@ def build_constrained_library_array(funcs, base,
             term_order[f.root] = f
 
     # Count the number of terms first, to initialize the library array.
-    library_length = len( list( build_library_expr_with_base(funcs, ivars, constraints, base) ) )
+    library_length = len(list(build_library_expr_with_base(funcs, ivars, constraints, base)))
     # print(f"Expecting {library_length} terms...")
     library = np.empty(library_length, dtype=data_base.dtype)
     term_id = 0
-    for terms in itertools.combinations_with_replacement(base, constraints['func_order']):
+    for terms in itertools.combinations_with_replacement(base, constraints["func_order"]):
         term = terms[0]
         term_order[terms[0].root].func_order += terms[0].func_order
         term_order[terms[0].root].diff_order += terms[0].diff_order
-        term_arr = np.squeeze(data_base[data_base['name']==str(term)]['val'],axis=0)
+        term_arr = np.squeeze(data_base[data_base["name"] == str(term)]["val"], axis=0)
         for multiplier in terms[1:]:
             term = term * multiplier
             term_order[multiplier.root].func_order += multiplier.func_order
             term_order[multiplier.root].diff_order += multiplier.diff_order
-            mul_arr = np.squeeze(data_base[data_base['name']==str(multiplier)]['val'],axis=0)
+            mul_arr = np.squeeze(data_base[data_base["name"] == str(multiplier)]["val"], axis=0)
             term_arr = term_arr * mul_arr
-        if ( (term.func_order <= constraints['func_order'])
-                 and (term.diff_order <= constraints['diff_order'])
-                 and (check_individual_constraints(term_order,funcs) )):
+        if (
+            (term.func_order <= constraints["func_order"])
+            and (term.diff_order <= constraints["diff_order"])
+            and (check_individual_constraints(term_order, funcs))
+        ):
             if print_terms:
                 print(f"({term_id}): {str(term)}")
             # new_term = np.array([(str(term),term_arr)],dtype=data_base.dtype)
             # library = np.append(library,new_term)
-            library[term_id]['name'] = str(term)
-            library[term_id]['val'] = term_arr
+            library[term_id]["name"] = str(term)
+            library[term_id]["val"] = term_arr
 
-            term_id +=1
+            term_id += 1
             # yield term
         for func in funcs:
             term_order[func.root].func_order = 0
@@ -358,12 +379,8 @@ def build_constrained_library_array(funcs, base,
 
     return library
 
-def combine_terms(library,
-                  terms,
-                  coeffs,
-                  new_term,
-                  show_combinations=False):
 
+def combine_terms(library, terms, coeffs, new_term, show_combinations=False):
     """
     combine_terms(library, terms_to_combine, coeffs):
 
@@ -400,7 +417,7 @@ def combine_terms(library,
         number of coefficients provided.
     """
 
-    library_terms = list(library['name'])
+    library_terms = list(library["name"])
 
     if new_term in set(library_terms):
         msg = f"New term {new_term} already in the library!"
@@ -408,30 +425,29 @@ def combine_terms(library,
         return library
 
     difference = set(terms).difference(library_terms)
-    if ( len(difference) != 0 ):
+    if len(difference) != 0:
         msg = f"The terms {difference} are not present in the \
                 original library!"
         raise ValueError(msg)
 
-    if ( len(terms) != len(coeffs) ):
+    if len(terms) != len(coeffs):
         msg = "Number of terms to combine is not equal to the \
                number of coefficients provided!"
         raise ValueError(msg)
 
     library_dtype = library.dtype
-    new_term_array = np.zeros_like(library[0]['val'])
-    new_term_str = 'Combining {\n'
-    for (term, coeff) in zip(terms,coeffs):
-        new_term_array += coeff * get_term_val( library, term )
-        new_term_str += f'\t {coeff} × {term}\n'
-        library = delete_term( library, term )
+    new_term_array = np.zeros_like(library[0]["val"])
+    new_term_str = "Combining {\n"
+    for term, coeff in zip(terms, coeffs):
+        new_term_array += coeff * get_term_val(library, term)
+        new_term_str += f"\t {coeff} × {term}\n"
+        library = delete_term(library, term)
 
-    new_term_str += '}' + f' → {new_term}'
+    new_term_str += "}" + f" → {new_term}"
     if show_combinations:
         print(new_term_str)
-    new_term_struct = np.array([(str(new_term),new_term_array)],
-                                dtype=library_dtype)
+    new_term_struct = np.array([(str(new_term), new_term_array)], dtype=library_dtype)
 
-    library = np.append(library,new_term_struct)
+    library = np.append(library, new_term_struct)
 
     return library

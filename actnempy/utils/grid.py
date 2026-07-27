@@ -3,21 +3,21 @@ from scipy import ndimage
 import itertools
 import warnings
 
-class Grid:
 
-    def __init__(self,ndims=2,h=None,boundary='periodic'):
+class Grid:
+    def __init__(self, ndims=2, h=None, boundary="periodic"):
         self._ndims = ndims
-        self._h = self._validate_grid(h,ndims)
+        self._h = self._validate_grid(h, ndims)
         self.boundary = boundary
 
-    def _validate_grid(self,h,ndims):
+    def _validate_grid(self, h, ndims):
         # check assumptions on h
         if h is None:
             h = np.ones(ndims)
             return h
         else:
             h = np.asanyarray(h)
-        if h.ndim == 0: # h is a scalar
+        if h.ndim == 0:  # h is a scalar
             h = np.ones(ndims) * h
         elif h.shape != (ndims,):
             msg = (
@@ -46,9 +46,8 @@ class Grid:
     def set_regular_bc(self):
         self.boundary = "regular"
 
-    def __deriv(self,f, ax, h, out, rank=0, boundary=None):
-        """
-        """
+    def __deriv(self, f, ax, h, out, rank=0, boundary=None):
+        """ """
         if boundary is None:
             boundary = self.boundary
 
@@ -57,22 +56,19 @@ class Grid:
         out_view = np.swapaxes(out, 0, rank + ax)
 
         if f_view.shape[0] >= 3:
-            inv2h_ax = 0.5/h[ax]
+            inv2h_ax = 0.5 / h[ax]
             # Central difference for the inner points
             out_view[1:-1] = inv2h_ax * (f_view[2:] - f_view[:-2])
-            if boundary=="regular":
+            if boundary == "regular":
                 # Forward difference for the first point
-                out_view[0] = 2.0*inv2h_ax * (f_view[1] - f_view[0])
+                out_view[0] = 2.0 * inv2h_ax * (f_view[1] - f_view[0])
                 # Backward difference for the last point
-                out_view[-1] = 2.0*inv2h_ax * (f_view[-1] - f_view[-2])
-            elif boundary=="periodic":
+                out_view[-1] = 2.0 * inv2h_ax * (f_view[-1] - f_view[-2])
+            elif boundary == "periodic":
                 out_view[0] = inv2h_ax * (f_view[1] - f_view[-1])
                 out_view[-1] = inv2h_ax * (f_view[0] - f_view[-2])
             else:
-                msg = (
-                    "Invalid boundary condition. "
-                    "Please use either `regular` or `periodic`."
-                )
+                msg = "Invalid boundary condition. Please use either `regular` or `periodic`."
                 raise ValueError(msg)
         else:
             out_view[:] = 0
@@ -129,11 +125,11 @@ class Grid:
             boundary = self.boundary
 
         # gradient will add another dimension of length ndims
-        gradf = np.empty(tuple([ndims]+list(f.shape)),float)
+        gradf = np.empty(tuple([ndims] + list(f.shape)), float)
         fshape = f.shape[:-ndims]
         rank = len(fshape)
         for ax in range(ndims):
-            self.__deriv(f, ax, h, gradf[ax], rank=rank,boundary=boundary)
+            self.__deriv(f, ax, h, gradf[ax], rank=rank, boundary=boundary)
 
         return gradf
 
@@ -195,17 +191,18 @@ class Grid:
         rank = f.ndim - ndims
 
         # divergence will reduce the first dimension
-        if rank < 1: # then the object is either a scalar, or is ill-defined
+        if rank < 1:  # then the object is either a scalar, or is ill-defined
             raise ValueError("Cannot compute divergence of scalar field")
 
         divf = np.zeros(f.shape[1:])
         temp = np.zeros(f.shape[1:])
-        div_dims = min(ndims,f.shape[0])
+        div_dims = min(ndims, f.shape[0])
         if ndims != f.shape[0]:
-            warnings.warn("Computing divergence along axis "
-                        f"of length {f.shape[0]} in a {ndims}D space.")
+            warnings.warn(
+                f"Computing divergence along axis of length {f.shape[0]} in a {ndims}D space."
+            )
         for ax in range(div_dims):
-            self.__deriv(f[ax], ax, h, temp, rank=rank-1,boundary=boundary)
+            self.__deriv(f[ax], ax, h, temp, rank=rank - 1, boundary=boundary)
             divf += temp
 
         return divf
@@ -280,16 +277,12 @@ class Grid:
             raise ValueError(msg)
 
         if vdims < ndims:
-            msg = (
-                "Number of tensor components must be "
-                "greater or equal to system dimension"
-            )
+            msg = "Number of tensor components must be greater or equal to system dimension"
             raise ValueError(msg)
 
         if vdims > 3:
             msg = "Curl is only valid in 2 or 3 dimensions"
             raise ValueError(msg)
-
 
         if ndims < vdims:
             old_shape = f.shape
@@ -300,13 +293,13 @@ class Grid:
             h = h_new
 
         # build Levi-Civita symbol
-        levi = np.zeros([3,3,3])
-        levi[0,1,2] = 1
-        levi[1,2,0] = 1
-        levi[2,0,1] = 1
-        levi[0,2,1] = -1
-        levi[2,1,0] = -1
-        levi[1,0,2] = -1
+        levi = np.zeros([3, 3, 3])
+        levi[0, 1, 2] = 1
+        levi[1, 2, 0] = 1
+        levi[2, 0, 1] = 1
+        levi[0, 2, 1] = -1
+        levi[2, 1, 0] = -1
+        levi[1, 0, 2] = -1
 
         if vdims == 2:
             out = np.zeros(f.shape[1:])
@@ -314,7 +307,7 @@ class Grid:
             out = np.zeros(f.shape)
 
         temp = np.empty(f.shape[1:])
-        for i, j, k in itertools.product(* ([range(3)]*3)):
+        for i, j, k in itertools.product(*([range(3)] * 3)):
             sign = levi[i, j, k]
             if sign == 0:
                 continue
@@ -323,11 +316,11 @@ class Grid:
                 if i != 2:
                     continue
 
-                self.__deriv(f[k], j, h, temp, rank=rank-1,boundary=boundary)
+                self.__deriv(f[k], j, h, temp, rank=rank - 1, boundary=boundary)
                 out += sign * temp
 
             else:
-                self.__deriv(f[k], j, h, temp, rank=rank-1,boundary=boundary)
+                self.__deriv(f[k], j, h, temp, rank=rank - 1, boundary=boundary)
                 out[i] += sign * temp
 
         if ndims < vdims:
@@ -391,23 +384,23 @@ class Grid:
 
         invh2 = 1.0 / (h * h)
 
-        kernel = np.zeros(ndims*[3])
-        idx = (...,) + (1,)*(ndims-1)
+        kernel = np.zeros(ndims * [3])
+        idx = (...,) + (1,) * (ndims - 1)
         for ax in range(ndims):
-            kernel[idx] += np.array([1,-2,1]) * invh2[ax]
+            kernel[idx] += np.array([1, -2, 1]) * invh2[ax]
             # permute
             idx = idx[-1:] + idx[:-1]
 
         lapf = np.empty(f.shape)
-        fshape = f.shape[:-ndims] # Shape of the resulting tensor
+        fshape = f.shape[:-ndims]  # Shape of the resulting tensor
 
         # Set the mode for convolutions according to the boundary
         # condition.
 
-        if boundary=="regular":
-            mode='nearest'
-        elif boundary=="periodic":
-            mode='wrap'
+        if boundary == "regular":
+            mode = "nearest"
+        elif boundary == "periodic":
+            mode = "wrap"
 
         for idx in itertools.product(*[range(s) for s in fshape]):
             ndimage.convolve(f[idx], kernel, mode=mode, output=lapf[idx])

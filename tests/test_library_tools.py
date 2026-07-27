@@ -8,8 +8,9 @@ module_dir = Path(__file__).resolve().parents[1].absolute()
 
 
 from actnempy.SINDy import library_tools as lt
-class TestLibraryTools(unittest.TestCase):
 
+
+class TestLibraryTools(unittest.TestCase):
     def test_function(self):
 
         uf = lt.Function("u", maxf=3, maxd=4)
@@ -34,7 +35,7 @@ class TestLibraryTools(unittest.TestCase):
         vf = lt.Function("v", maxf=2, maxd=3)
 
         wf = uf * vf
-        self.assertEqual(wf.__repr__(), "u \u00D7 v")
+        self.assertEqual(wf.__repr__(), "u \u00d7 v")
         self.assertEqual(wf.diff_order, 0)
         self.assertEqual(wf.func_order, 2)
 
@@ -91,13 +92,13 @@ class TestLibraryTools(unittest.TestCase):
 
         # Multiply function with derivative
         wf = uf * uxf
-        self.assertEqual(wf.__repr__(), "u \u00D7 (∂u/∂x)")
+        self.assertEqual(wf.__repr__(), "u \u00d7 (∂u/∂x)")
         self.assertEqual(wf.func_order, 2)
         self.assertEqual(wf.diff_order, 1)
 
         # Multiply derivative with derivative
         wf = uxf * uxf
-        self.assertEqual(wf.__repr__(), "(∂u/∂x) \u00D7 (∂u/∂x)")
+        self.assertEqual(wf.__repr__(), "(∂u/∂x) \u00d7 (∂u/∂x)")
         self.assertEqual(wf.func_order, 2)
         self.assertEqual(wf.diff_order, 2)
 
@@ -107,10 +108,7 @@ class TestLibraryTools(unittest.TestCase):
         uf = lt.Function("u", maxf=1, maxd=3)
         funcs = [uf]
         ivars = ["x"]
-        constraints = {
-            "func_order": 3,
-            "diff_order": 2
-        }
+        constraints = {"func_order": 3, "diff_order": 2}
         base = lt.build_base_expr(funcs, ivars, constraints)
         self.assertEqual(len(base), 4)
         self.assertEqual(base[0].__repr__(), "u")
@@ -123,19 +121,10 @@ class TestLibraryTools(unittest.TestCase):
         uf = lt.Function("u", maxf=1, maxd=3)
         funcs = [uf]
         ivars = ["x", "y"]
-        constraints = {
-            "func_order": 3,
-            "diff_order": 2
-        }
+        constraints = {"func_order": 3, "diff_order": 2}
         base = lt.build_base_expr(funcs, ivars, constraints)
 
-        base_exp = ["u",
-                    "(∂u/∂x)",
-                    "(∂u/∂y)",
-                    "(∂²u/∂x²)",
-                    "(∂²u/∂x∂y)",
-                    "(∂²u/∂y²)",
-                    "1"]
+        base_exp = ["u", "(∂u/∂x)", "(∂u/∂y)", "(∂²u/∂x²)", "(∂²u/∂x∂y)", "(∂²u/∂y²)", "1"]
 
         n = len(base_exp)
         self.assertEqual(len(base), n)
@@ -148,18 +137,10 @@ class TestLibraryTools(unittest.TestCase):
         vf = lt.Function("v", maxf=2, maxd=1)
         funcs = [uf, vf]
         ivars = ["x"]
-        constraints = {
-            "func_order": 3,
-            "diff_order": 2
-        }
+        constraints = {"func_order": 3, "diff_order": 2}
         base = lt.build_base_expr(funcs, ivars, constraints)
 
-        base_exp = ["u",
-                    "v",
-                    "(∂u/∂x)",
-                    "(∂v/∂x)",
-                    "(∂²u/∂x²)",
-                    "1"]
+        base_exp = ["u", "v", "(∂u/∂x)", "(∂v/∂x)", "(∂²u/∂x²)", "1"]
 
         n = len(base_exp)
         self.assertEqual(len(base), n)
@@ -172,32 +153,31 @@ class TestLibraryTools(unittest.TestCase):
         vf = lt.Function("v", maxf=2, maxd=1)
         funcs = [uf, vf]
         ivars = ["x"]
-        constraints = {
-            "func_order": 3,
-            "diff_order": 2
-        }
+        constraints = {"func_order": 3, "diff_order": 2}
         base = lt.build_base_expr(funcs, ivars, constraints)
         lib = lt.build_library_expr_with_base(funcs, ivars, constraints, base)
         # lib = list(lib)
 
-        lib_exp = ["u \u00D7 v \u00D7 v",
-                   "u \u00D7 v \u00D7 (∂v/∂x)",
-                   "u \u00D7 v",
-                   "u \u00D7 (∂v/∂x)",
-                   "u",
-                   "v \u00D7 v \u00D7 (∂u/∂x)",
-                   "v \u00D7 v \u00D7 (∂²u/∂x²)",
-                   "v \u00D7 v",
-                   "v \u00D7 (∂u/∂x) \u00D7 (∂v/∂x)",
-                   "v \u00D7 (∂u/∂x)",
-                   "v \u00D7 (∂v /∂x)",
-                   "v \u00D7 (∂²u /∂x²)",
-                   "v",
-                   "(∂v/∂x) \u00D7 (∂u/∂x)",
-                   "(∂u/∂x)",
-                   "(∂v/∂x)",
-                   "(∂²u/∂x²)",
-                   "1"]
+        lib_exp = [
+            "u \u00d7 v \u00d7 v",
+            "u \u00d7 v \u00d7 (∂v/∂x)",
+            "u \u00d7 v",
+            "u \u00d7 (∂v/∂x)",
+            "u",
+            "v \u00d7 v \u00d7 (∂u/∂x)",
+            "v \u00d7 v \u00d7 (∂²u/∂x²)",
+            "v \u00d7 v",
+            "v \u00d7 (∂u/∂x) \u00d7 (∂v/∂x)",
+            "v \u00d7 (∂u/∂x)",
+            "v \u00d7 (∂v /∂x)",
+            "v \u00d7 (∂²u /∂x²)",
+            "v",
+            "(∂v/∂x) \u00d7 (∂u/∂x)",
+            "(∂u/∂x)",
+            "(∂v/∂x)",
+            "(∂²u/∂x²)",
+            "1",
+        ]
 
         n = len(lib_exp)
 
@@ -208,4 +188,3 @@ class TestLibraryTools(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

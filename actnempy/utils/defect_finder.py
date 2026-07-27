@@ -19,25 +19,25 @@ from scipy import signal
 
 from skimage.measure import label, regionprops
 
+
 def func_unitcircle(r):
     # just makes a ring of ones
     # https://stackoverflow.com/questions/39073973/how-to-generate-a-matrix-with-circle-of-ones-in-numpy-scipy
-    d = 2*r + 1
-    rx, ry = d/2, d/2
+    d = 2 * r + 1
+    rx, ry = d / 2, d / 2
     x_grid, y_grid = np.indices((d, d))
-    ring_filter = (np.abs(np.hypot(rx - x_grid, ry - y_grid)-r)
-                   < 0.5).astype(int)
+    ring_filter = (np.abs(np.hypot(rx - x_grid, ry - y_grid) - r) < 0.5).astype(int)
 
-    x_grid = x_grid-d/2
-    y_grid = y_grid-d/2
+    x_grid = x_grid - d / 2
+    y_grid = y_grid - d / 2
 
-    r_grid = (x_grid**2+y_grid**2)**0.5
+    r_grid = (x_grid**2 + y_grid**2) ** 0.5
 
     x_grid[ring_filter == 0] = 0
     y_grid[ring_filter == 0] = 0
 
-    filter_x = -y_grid/r_grid
-    filter_y = x_grid/r_grid
+    filter_x = -y_grid / r_grid
+    filter_y = x_grid / r_grid
 
     return (x_grid, y_grid, filter_x, filter_y, ring_filter)
 
@@ -61,41 +61,41 @@ def func_defectfind(nx, ny, filter_radius, switchsign):
     map_m : map for -1/2 defects
     """
 
-    x_grid, y_grid, filter_x, filter_y, ring_filter = func_unitcircle(
-        filter_radius)
+    x_grid, y_grid, filter_x, filter_y, ring_filter = func_unitcircle(filter_radius)
 
-    Qxx = nx**2-1/2
-    Qxy = nx*ny
+    Qxx = nx**2 - 1 / 2
+    Qxy = nx * ny
 
     Qxx_x, Qxx_y = np.gradient(Qxx)
     Qxy_x, Qxy_y = np.gradient(Qxy)
 
-    denom = (1+4*Qxx+4*Qxy**2+4*Qxx**2)
-    dphidx_num = 2*(-2*Qxy*Qxx_x+(1+2*Qxx)*Qxy_x)
-    dphidy_num = 2*(-2*Qxy*Qxx_y+(1+2*Qxx)*Qxy_y)
+    denom = 1 + 4 * Qxx + 4 * Qxy**2 + 4 * Qxx**2
+    dphidx_num = 2 * (-2 * Qxy * Qxx_x + (1 + 2 * Qxx) * Qxy_x)
+    dphidy_num = 2 * (-2 * Qxy * Qxx_y + (1 + 2 * Qxx) * Qxy_y)
 
-    dphidx = dphidx_num/denom
-    dphidy = dphidy_num/denom
+    dphidx = dphidx_num / denom
+    dphidy = dphidy_num / denom
 
-    eps_mine = 1E0
+    eps_mine = 1e0
 
-    #remove ~0/0 artifacts
+    # remove ~0/0 artifacts
     dphidx[(np.abs(denom) < eps_mine) & (np.abs(dphidx_num) < eps_mine)] = 0
     dphidy[(np.abs(denom) < eps_mine) & (np.abs(dphidy_num) < eps_mine)] = 0  #
 
-    map = signal.convolve2d(dphidy, filter_y, boundary='symm', mode='same') + \
-        signal.convolve2d(dphidx, filter_x, boundary='symm', mode='same')
+    map = signal.convolve2d(dphidy, filter_y, boundary="symm", mode="same") + signal.convolve2d(
+        dphidx, filter_x, boundary="symm", mode="same"
+    )
 
     Nrows, Ncolumns = np.shape(map)
 
     map_m = np.zeros((Nrows, Ncolumns))
     map_p = np.zeros((Nrows, Ncolumns))
-    #map_zeros= np.zeros((Nrows, Ncolumns))
-    #map_zeros[(map > -0.2) & (map < 0.2)] = 1
+    # map_zeros= np.zeros((Nrows, Ncolumns))
+    # map_zeros[(map > -0.2) & (map < 0.2)] = 1
 
-    #map_p[map > threshold_otsu(map)] = 1
+    # map_p[map > threshold_otsu(map)] = 1
 
-    #auto-threshold using threshold_otsu acts funny.. just hard-code a threshold
+    # auto-threshold using threshold_otsu acts funny.. just hard-code a threshold
 
     if switchsign == 1:
         map_m[map > 1] = 1
@@ -104,7 +104,7 @@ def func_defectfind(nx, ny, filter_radius, switchsign):
         map_m[map < -1] = 1
         map_p[map > 1] = 1
 
-    return(map, map_p, map_m)
+    return (map, map_p, map_m)
 
 
 def func_defectpos(binmap, areathresh):
@@ -143,7 +143,7 @@ def func_defectpos(binmap, areathresh):
     # centroid_list_reshape = np.reshape(centroid_list, [N, 2])
 
     centroid_list_reshape = np.array([centroid_xs, centroid_ys]).T
-    return(centroid_list_reshape)
+    return centroid_list_reshape
 
 
 def func_defectorient(centroids, nx, ny, filter_radius, type_str):
@@ -164,8 +164,7 @@ def func_defectorient(centroids, nx, ny, filter_radius, type_str):
     [phi1,phi2...phiN] =  list of defect angles [0,2pi]
     """
 
-    x_grid, y_grid, filter_x, filter_y, ring_filter = func_unitcircle(
-        filter_radius)
+    x_grid, y_grid, filter_x, filter_y, ring_filter = func_unitcircle(filter_radius)
 
     pos = np.argwhere(ring_filter > 0)
     x_ring = np.ceil(pos[:, 0] - filter_radius)
@@ -189,16 +188,15 @@ def func_defectorient(centroids, nx, ny, filter_radius, type_str):
     Nrows, Ncolumns = np.shape(nx)
 
     for ii in range(0, N_defects):
-
         x0 = centroids_x[ii]
         y0 = centroids_y[ii]
 
         x = x0 + x_ring
         y = y0 + y_ring
 
-        x[x > (Ncolumns-1)] = Ncolumns-1
+        x[x > (Ncolumns - 1)] = Ncolumns - 1
         x[x < 0] = 0
-        y[y > (Nrows-1)] = Nrows-1
+        y[y > (Nrows - 1)] = Nrows - 1
         y[y < 0] = 0
 
         x = x.astype(int)
@@ -208,17 +206,16 @@ def func_defectorient(centroids, nx, ny, filter_radius, type_str):
         nx_local = nx[y, x]
         ny_local = ny[y, x]
 
-        dotprod = np.abs(nx_local*np.cos(theta_sort) +
-                         ny_local*np.sin(theta_sort))
+        dotprod = np.abs(nx_local * np.cos(theta_sort) + ny_local * np.sin(theta_sort))
 
         if np.char.equal(type_str, "positive") == 1:
-            phi[ii] = theta_sort[np.argmax(dotprod)]+np.pi
+            phi[ii] = theta_sort[np.argmax(dotprod)] + np.pi
         elif np.char.equal(type_str, "negative") == 1:
             phi[ii] = theta_sort[np.argmax(dotprod)]
         else:
             print("check type_str")
 
-    return(phi)
+    return phi
 
 
 def func_plotdefects(ax, centroids, phi, color_str, type_str, scale):
@@ -232,12 +229,11 @@ def func_plotdefects(ax, centroids, phi, color_str, type_str, scale):
     phi = phi.flatten()
 
     for ii in range(0, N_defects):
-
         x0 = centroids_x[ii]
         y0 = centroids_y[ii]
 
-        x1 = x0 + scale*np.cos(phi[ii])
-        y1 = y0 + scale*np.sin(phi[ii])
+        x1 = x0 + scale * np.cos(phi[ii])
+        y1 = y0 + scale * np.sin(phi[ii])
 
         ax.scatter(x0, y0, color=color_str)
 
@@ -245,14 +241,15 @@ def func_plotdefects(ax, centroids, phi, color_str, type_str, scale):
             ax.plot((x0, x1), (y0, y1), color_str, linewidth=2.5)
         else:
             for jj in range(0, 3):
-                x1 = x0 + scale*np.cos(phi[ii]+(jj+1)*2*np.pi/3)
-                y1 = y0 + scale*np.sin(phi[ii]+(jj+1)*2*np.pi/3)
+                x1 = x0 + scale * np.cos(phi[ii] + (jj + 1) * 2 * np.pi / 3)
+                y1 = y0 + scale * np.sin(phi[ii] + (jj + 1) * 2 * np.pi / 3)
                 ax.plot((x0, x1), (y0, y1), color_str, linewidth=2.5)
 
     return
 
 
 # 2021.08.17: func_wrap() and func_crop() added to help with periodic boundary conditions
+
 
 def func_wrap(A, periodic_x, periodic_y, padamount):
 
@@ -267,7 +264,7 @@ def func_wrap(A, periodic_x, periodic_y, padamount):
         A_pad = A[0:padamount, :]
         A = np.vstack((A, A_pad))
 
-    return(A)
+    return A
 
 
 def func_crop(A, periodic_x, periodic_y, padamount):
@@ -280,4 +277,4 @@ def func_crop(A, periodic_x, periodic_y, padamount):
     elif periodic_y == 1:
         A = A[0:-padamount, :]
 
-    return(A)
+    return A
