@@ -13,14 +13,16 @@ The main object of this module is the Class Anise, which is designed to handle m
 import os
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
-import numpy as np
 import json
+
+import numpy as np
+from tqdm import tqdm
+
+from ..actnem import ActNem
 from ..utils import Grid, get_random_sample
 from .library_tools import Function, build_base_expr, build_constrained_library_array, get_term_val
-from .weak_form import TestFunction, TestRxx, TestRxy
 from .pde import PDE
-from tqdm import tqdm
-from ..actnem import ActNem
+from .weak_form import TestFunction, TestRxx, TestRxy
 
 
 class Anise(ActNem):

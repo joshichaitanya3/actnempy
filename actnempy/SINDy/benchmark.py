@@ -1,8 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from ..utils.misc import add_noise
-from .library_tools import delete_term
 from .anise import Anise
+from .library_tools import delete_term
 from .pde import PDE
 
 

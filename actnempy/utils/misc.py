@@ -1,8 +1,10 @@
-import numpy as np
-from scipy.ndimage import gaussian_filter
-from numpy import linalg as LA
-from .optimal_SVHT_coef import optimal_SVHT_coef
 import warnings
+
+import numpy as np
+from numpy import linalg as LA
+from scipy.ndimage import gaussian_filter
+
+from .optimal_SVHT_coef import optimal_SVHT_coef
 
 # Check if cv2 library is available
 no_cv2 = False

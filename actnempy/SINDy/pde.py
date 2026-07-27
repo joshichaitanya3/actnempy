@@ -13,12 +13,14 @@ some modifications of the functions available in the original PDE-FIND framework
 
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from .library_tools import get_term_val
 import warnings
-from ..utils.grid import Grid
+
+import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.metrics import r2_score
+
+from ..utils.grid import Grid
+from .library_tools import get_term_val
 
 
 def HRidge(X0, y, lam, normalize=2):

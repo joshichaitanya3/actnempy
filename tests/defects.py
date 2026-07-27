@@ -1,6 +1,7 @@
-import numpy as np
 import sys
 from pathlib import Path
+
+import numpy as np
 
 module_dir = Path(__file__).parent.parent.absolute()  # The modules are two directories up
 sys.path.append(module_dir.as_posix())

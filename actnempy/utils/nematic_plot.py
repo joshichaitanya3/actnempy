@@ -18,14 +18,13 @@ details.
 
 """
 
-import numpy as np
-
 import matplotlib
 import matplotlib.cm as cm
-import matplotlib.colors as mcolors
 import matplotlib.collections as mcollections
+import matplotlib.colors as mcolors
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+import numpy as np
 
 __all__ = ["nematic_plot"]
 

@@ -1,7 +1,8 @@
-import numpy as np
-from scipy import ndimage
 import itertools
 import warnings
+
+import numpy as np
+from scipy import ndimage
 
 
 class Grid:

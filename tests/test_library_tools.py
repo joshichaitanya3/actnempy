@@ -1,5 +1,5 @@
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up

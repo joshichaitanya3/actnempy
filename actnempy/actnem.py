@@ -13,20 +13,22 @@ Functionalities include: visualizing the director and velocity, computing veloci
 import os
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
-import numpy as np
-import matplotlib.pyplot as plt
 import json
-from .utils import (
-    nematic_plot,
-    compute_n,
-    Grid,
-    func_defectfind,
-    func_defectpos,
-    func_defectorient,
-    func_plotdefects,
-)
-from tqdm import tqdm
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.signal import correlate
+from tqdm import tqdm
+
+from .utils import (
+    Grid,
+    compute_n,
+    func_defectfind,
+    func_defectorient,
+    func_defectpos,
+    func_plotdefects,
+    nematic_plot,
+)
 
 
 class ActNem:

@@ -1,11 +1,12 @@
-import numpy as np
-from numpy.testing import assert_allclose
 import os
-from pathlib import Path
-import gdown
 import unittest
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
+
+import gdown
+import numpy as np
+from numpy.testing import assert_allclose
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up

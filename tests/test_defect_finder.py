@@ -1,7 +1,8 @@
+import unittest
+from pathlib import Path
+
 import numpy as np
 from numpy.testing import assert_allclose
-from pathlib import Path
-import unittest
 
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up

@@ -11,12 +11,10 @@ import numpy as np
 
 # -----------------
 # image convolution
-
 from scipy import signal
 
 # -----------------
 # image processing
-
 from skimage.measure import label, regionprops
 
 

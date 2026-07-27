@@ -2,9 +2,10 @@
 Functions and Classes for creating library of terms
 """
 
-import itertools
-import numpy as np
 import copy
+import itertools
+
+import numpy as np
 
 
 class Function:
