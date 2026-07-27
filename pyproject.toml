@@ -6,3 +6,16 @@ build-backend = "setuptools.build_meta"
 filterwarnings = [
     "ignore::DeprecationWarning:gdown",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (unused imports/vars, undefined names, etc.)
+    "I",   # isort (import sorting)
+    "UP",  # pyupgrade (modernize syntax for the target version)
+]
