@@ -190,7 +190,7 @@ def kfold_cv(X, y, k=10):
 
     r2train = np.zeros([k, nparameters])
     r2test = np.zeros([k, nparameters])
-    w_all_train = np.zeros([k,nparameters,nparameters], dtype=np.complex_)
+    w_all_train = np.zeros([k,nparameters,nparameters], dtype=np.complex128)
     for i in range(k):
         subsample = slice(ids[i],ids[i+1])
         Xtrain = np.delete(X, subsample, axis=0)
