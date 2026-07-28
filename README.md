@@ -1,5 +1,8 @@
 # actnempy
 
+[![Test](https://github.com/joshichaitanya3/actnempy/actions/workflows/test.yml/badge.svg)](https://github.com/joshichaitanya3/actnempy/actions/workflows/test.yml)
+[![Lint](https://github.com/joshichaitanya3/actnempy/actions/workflows/lint.yml/badge.svg)](https://github.com/joshichaitanya3/actnempy/actions/workflows/lint.yml)
+
 Analysis suite for 2D active nematics data, written in Python3.
 
 This code has benefited from crucial contributions from Matthew S. E. Peterson ([@mattsep](https://github.com/mattsep)) and Michael M. Norton ([@wearefor](https://github.com/wearefor)).
