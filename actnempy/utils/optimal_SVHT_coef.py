@@ -113,29 +113,6 @@ def optimal_SVHT_coef_sigma_unknown(beta):
     return coef / np.sqrt(mp_median)
 
 
-def median_marcenko_pastur(x, beta):
-
-    if (beta <= 0) or (beta > 1):
-        msg = "Invalid value of beta. Beta should lie between 0 and 1"
-        raise ValueError(msg)
-
-    lower_bound = (1 - np.sqrt(beta)) ** 2
-    higher_bound = (1 + np.sqrt(beta)) ** 2
-
-    if (x < lower_bound) or (x > higher_bound):
-        msg = (
-            "Invalid value of x. " + "x should lie between (1-sqrt(beta))**2 and  (1+sqrt(beta))**2"
-        )
-        raise ValueError(msg)
-
-    dens = lambda t: np.sqrt((higher_bound - t) * (t - lower_bound)) / (2 * np.pi * beta * t)
-
-    (I, _) = integrate.quad(dens, lower_bound, x)
-    print(f"x = {x:.3f}, beta = {beta:.3f}, I = {I:.3f}")
-
-    return I
-
-
 def median_marcenko_pastur(beta):
 
     mar_pas = lambda x: 1 - inc_mar_pas(x, beta, 0)
