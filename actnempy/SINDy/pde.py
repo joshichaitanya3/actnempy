@@ -258,7 +258,7 @@ def print_pde(w, rhs_description, ut="u_t"):
         if w[i] != 0:
             if not first:
                 pde = pde + len(ut) * " " + "+ "
-            pde = pde + "(%g) " % w[i].real + rhs_description[i] + "\n   "
+            pde = pde + f"{w[i].real:g} " + rhs_description[i] + "\n   "
             first = False
     print(pde)
 
@@ -526,10 +526,10 @@ class PDE:
         # fig = plt.figure()
         zv = self.variance == 0  # ids with zero variance
 
-        p1 = plt.errorbar(
+        plt.errorbar(
             self.n_terms[zv], self.fvu_mean[zv], yerr=self.fvu_err[:, zv], fmt="o", color="tab:blue"
         )
-        p2 = plt.errorbar(
+        plt.errorbar(
             self.n_terms[~zv],
             self.fvu_mean[~zv],
             yerr=self.fvu_err[:, ~zv],
@@ -537,14 +537,17 @@ class PDE:
             color="tab:blue",
         )
 
-        # p3 = plt.errorbar(self.n_terms[zv],self.fvut_mean[zv],yerr=self.fvut_err[:,zv],fmt='o',color='tab:blue')
-        # p4 = plt.errorbar(self.n_terms[~zv],self.fvut_mean[~zv],yerr=self.fvut_err[:,~zv],fmt='^',color='tab:blue')
+        # p3 = plt.errorbar(self.n_terms[zv],self.fvut_mean[zv],yerr=self.fvut_err[:,zv],
+        # fmt='o',color='tab:blue')
+        # p4 = plt.errorbar(self.n_terms[~zv],self.fvut_mean[~zv],yerr=self.fvut_err[:,~zv],
+        # fmt='^',color='tab:blue')
         yl, yh = plt.gca().get_ylim()
         plt.yscale("log")
         plt.xlabel("Number of non-zero terms")
         plt.ylabel(r"$1 - R^2$")
 
-        # plt.legend([p3,p4],['Indicates same model under cross-validation','Indicates different model under cross-validation'],scatterpoints=2)
+        # plt.legend([p3,p4],['Indicates same model under cross-validation',
+        # 'Indicates different model under cross-validation'],scatterpoints=2)
         plt.xlim([0, nterms + 0.5])
         plt.tight_layout()
         if filename is None:

@@ -115,7 +115,8 @@ def optimal_SVHT_coef_sigma_unknown(beta):
 
 def median_marcenko_pastur(beta):
 
-    mar_pas = lambda x: 1 - inc_mar_pas(x, beta, 0)
+    def mar_pas(x):
+        return 1 - inc_mar_pas(x, beta, 0)
     lower_bound = (1 - np.sqrt(beta)) ** 2
     higher_bound = (1 + np.sqrt(beta)) ** 2
 
@@ -147,19 +148,22 @@ def inc_mar_pas(x0, beta, gamma):
     top_spec = (1 + np.sqrt(beta)) ** 2
     bot_spec = (1 - np.sqrt(beta)) ** 2
 
-    mar_pas = lambda x: if_else(
-        Q=(top_spec - x) * (x - bot_spec) > 0,
-        point=np.sqrt((top_spec - x) * (x - bot_spec)) / (beta * x) / (2 * np.pi),
-        counter_point=0,
-    )
+    def mar_pas(x):
+        return if_else(
+            Q=(top_spec - x) * (x - bot_spec) > 0,
+            point=np.sqrt((top_spec - x) * (x - bot_spec)) / (beta * x) / (2 * np.pi),
+            counter_point=0,
+        )
     if gamma != 0:
-        fun = lambda x: x**gamma * mar_pas(x)
+        def fun(x):
+            return x**gamma * mar_pas(x)
     else:
-        fun = lambda x: mar_pas(x)
+        def fun(x):
+            return mar_pas(x)
 
-    (I, _) = integrate.quad(fun, x0, top_spec)
+    (integral, _) = integrate.quad(fun, x0, top_spec)
 
-    return I
+    return integral
 
 
 def if_else(Q, point, counter_point):

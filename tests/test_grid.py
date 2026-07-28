@@ -4,12 +4,12 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 
+from actnempy.utils.grid import Grid
+
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
-
-from actnempy.utils.grid import Grid
 
 
 class TestGrid(unittest.TestCase):

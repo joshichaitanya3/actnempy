@@ -1,13 +1,12 @@
 import unittest
 from pathlib import Path
 
+from actnempy.SINDy import library_tools as lt
+
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
-
-
-from actnempy.SINDy import library_tools as lt
 
 
 class TestLibraryTools(unittest.TestCase):

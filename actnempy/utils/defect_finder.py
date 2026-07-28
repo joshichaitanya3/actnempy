@@ -2,7 +2,8 @@
 # Line integration for defect identification in nematics via convolution
 # % ------------------------------------------------------------
 # Michael M. Norton, Physics @ Rochester Institute of Technology, 2021
-# in collaboration w/ Grover Lab (Piyush Grover and Caleb Wagner, Mech. Eng. @ University of Nebraska-Lincoln)
+# in collaboration w/ Grover Lab (Piyush Grover and Caleb Wagner, Mech. Eng. @ University of
+# Nebraska-Lincoln)
 # ---------------------------------
 
 # -----------------
@@ -44,7 +45,8 @@ def func_defectfind(nx, ny, filter_radius, switchsign):
     """
     func_defectfind(x,y,x0,y0)
 
-    Function returns scalar maps the size of the input arrays that identify regions of topological charge
+    Function returns scalar maps the size of the input arrays that identify regions of
+    topological charge
 
     Parameters
     ----------

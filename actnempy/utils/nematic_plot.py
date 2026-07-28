@@ -125,8 +125,8 @@ def nematic_plot(
 
     if integration_direction not in ["both", "forward", "backward"]:
         errstr = (
-            "Integration direction '%s' not recognised. "
-            "Expected 'both', 'forward' or 'backward'." % integration_direction
+            f"Integration direction '{integration_direction}' not recognised. "
+            "Expected 'both', 'forward' or 'backward'."
         )
         raise ValueError(errstr)
 

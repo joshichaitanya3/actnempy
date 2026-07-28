@@ -4,9 +4,13 @@ Active Nematics Analysis Suite
 
 Code by Chaitanya Joshi (chaitanya@brandeis.edu)
 
-The main object of this module is the ActNem class. This class combines key methods for analysis of 2D active nematics data of Q-tensor and velocity data in one place, allowing for easy processing of large datasets.
+The main object of this module is the ActNem class. This class combines key methods for
+analysis of 2D active nematics data of Q-tensor and velocity data in one place, allowing for
+easy processing of large datasets.
 
-Functionalities include: visualizing the director and velocity, computing velocity autocorrelation and orientation autocorrelation functions in time, defect finding (with tracking coming soon).
+Functionalities include: visualizing the director and velocity, computing velocity
+autocorrelation and orientation autocorrelation functions in time, defect finding (with
+tracking coming soon).
 
 """
 
@@ -44,9 +48,13 @@ class ActNem:
     data_dir : str
         Path to the data directory. This directory must contain the following files:
 
-            `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`, `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial dimensions and T being the time dimension. The preprocessing of the experimental / simulation data into this format is done elsewhere.
+            `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`,
+            `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial
+            dimensions and T being the time dimension. The preprocessing of the experimental /
+            simulation data into this format is done elsewhere.
 
-            `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying the spatial and temoral discretization of the data.
+            `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying
+            the spatial and temoral discretization of the data.
 
     visual_check : bool
         An optional flag to plot the first five frames of the data as a visual check.
@@ -275,7 +283,9 @@ class ActNem:
         """
         vcorr = velocity_autocorr()
 
-        Computes the spatially averaged velocity time correlation function from the data. It then prints the correlation time by computing when the correlation function drops to 1/e.
+        Computes the spatially averaged velocity time correlation function from the data. It
+        then prints the correlation time by computing when the correlation function drops to
+        1/e.
 
         Returns
         -------
@@ -303,7 +313,9 @@ class ActNem:
         """
         ocorr = orientation_autocorr()
 
-        Computes the spatially averaged orientation time correlation function from the data. It then prints the correlation time by computing when the correlation function drops to 1/e.
+        Computes the spatially averaged orientation time correlation function from the data. It
+        then prints the correlation time by computing when the correlation function drops to
+        1/e.
 
         Returns
         -------

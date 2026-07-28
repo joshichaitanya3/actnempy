@@ -219,8 +219,8 @@ def build_base_expr(funcs, ivars, constraints):
     order, we want all possible terms involving the functions and their derivatives subject to
     said constraints.
 
-    Really, what this boils down to is con  structing all possible derivatives, and a way of counting
-    the differential order.
+    Really, what this boils down to is constructing all possible derivatives, and a way of
+    counting the differential order.
     """
 
     base = []

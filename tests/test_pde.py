@@ -4,12 +4,12 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose
 
+from actnempy.SINDy import HRidge
+
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
-
-from actnempy.SINDy import HRidge
 
 
 class TestPDE(unittest.TestCase):
@@ -48,7 +48,8 @@ class TestPDE(unittest.TestCase):
         self.assertIsNone(assert_allclose(w_all[0], w0exp, rtol=0.1))
         self.assertTrue(
             w_all[1, -1] == 0
-        )  # The first term to be removed has to be the one with the smallest strength, which is the f3 one, and so on.
+        )  # The first term to be removed has to be the one with the smallest strength, which
+        # is the f3 one, and so on.
         self.assertIsNone(assert_allclose(w_all[1], w1exp, rtol=0.1))
         self.assertTrue(w_all[2, -1] == 0)
         self.assertTrue(w_all[2, -2] == 0)

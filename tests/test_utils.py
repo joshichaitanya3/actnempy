@@ -5,12 +5,12 @@ from unittest import skip
 import numpy as np
 from numpy.testing import assert_allclose
 
+import actnempy.utils as ut
+
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
-
-import actnempy.utils as ut
 
 
 class TestUtils(unittest.TestCase):
@@ -65,7 +65,8 @@ class TestUtils(unittest.TestCase):
 
         # Setup the array x such that it is pi/2 almost everywhere.
         # It has a NaN in one location, and two points around it have values -pi/2.
-        # Note that the values around the NaN now average to zero, but not if they are director angles, since pi/2 and -pi/2 are equivalent.
+        # Note that the values around the NaN now average to zero, but not if they are director
+        # angles, since pi/2 and -pi/2 are equivalent.
 
         x = 0.5 * np.pi * np.ones([10, 10])
         x[4, 4] = -0.5 * np.pi

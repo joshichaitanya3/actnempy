@@ -6,7 +6,8 @@ Main module (Anise)
 
 Code by Chaitanya Joshi (chaitanya@brandeis.edu)
 
-The main object of this module is the Class Anise, which is designed to handle model identification for 2D active nematic data of Q-tensor and velocity.
+The main object of this module is the Class Anise, which is designed to handle model
+identification for 2D active nematic data of Q-tensor and velocity.
 
 """
 
@@ -28,7 +29,8 @@ from .weak_form import TestFunction, TestRxx, TestRxy
 class Anise(ActNem):
     """
 
-    This class is designed to handle model identification for 2D active nematic data of Q-tensor and velocity.
+    This class is designed to handle model identification for 2D active nematic data of Q-tensor
+    and velocity.
 
     Attributes
     ----------
@@ -36,9 +38,13 @@ class Anise(ActNem):
     data_dir : str
         Path to the data directory. This directory must contain the following files:
 
-            `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`, `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial dimensions and T being the time dimension. The preprocessing of the experimental / simulation data into this format is done elsewhere.
+            `processed_data.npz`: A single .npz file containing 4 arrays: `Qxx_all`, `Qxy_all`,
+            `u_all` and `v_all`, each of dimensions (NX, NY, NT), with X-Y being the spatial
+            dimensions and T being the time dimension. The preprocessing of the experimental /
+            simulation data into this format is done elsewhere.
 
-            `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying the spatial and temoral discretization of the data.
+            `metadata.json` : A json file containing three keys: 'dx', 'dy' and 'dt', specifying
+            the spatial and temoral discretization of the data.
 
     visual_check : bool
         An optional flag to plot the first five frames of the data as a visual check.
@@ -188,7 +194,6 @@ class Anise(ActNem):
         arr_type = "complex128"
 
         pts_per_window = window_size**3
-        num_points = num_windows * pts_per_window
 
         # Initialize arrays to store libraries with 'num_windows' points
         W = np.zeros((num_windows, 1))
@@ -235,18 +240,6 @@ class Anise(ActNem):
         QXYxy = np.zeros((num_windows, 1))
         QXYyy = np.zeros((num_windows, 1))
 
-        Wxxx = np.zeros((num_windows, 1))
-        Wxxy = np.zeros((num_windows, 1))
-        Wxyy = np.zeros((num_windows, 1))
-        Wyyy = np.zeros((num_windows, 1))
-
-        Uxxx = np.zeros((num_windows, 1))
-        Uxxy = np.zeros((num_windows, 1))
-        Uxyy = np.zeros((num_windows, 1))
-        Uyyy = np.zeros((num_windows, 1))
-
-        Vxxx = np.zeros((num_windows, 1))
-
         QXXxxx = np.zeros((num_windows, 1))
         QXXxxy = np.zeros((num_windows, 1))
         QXXxyy = np.zeros((num_windows, 1))
@@ -256,14 +249,6 @@ class Anise(ActNem):
         QXYxxy = np.zeros((num_windows, 1))
         QXYxyy = np.zeros((num_windows, 1))
         QXYyyy = np.zeros((num_windows, 1))
-
-        Uxxxx = np.zeros((num_windows, 1))
-        Uxxxy = np.zeros((num_windows, 1))
-        Uxxyy = np.zeros((num_windows, 1))
-        Uxyyy = np.zeros((num_windows, 1))
-        Uyyyy = np.zeros((num_windows, 1))
-
-        Vxxxx = np.zeros((num_windows, 1))
 
         QXXxxxx = np.zeros((num_windows, 1))
         QXXxxxy = np.zeros((num_windows, 1))
@@ -452,18 +437,6 @@ class Anise(ActNem):
         QXYxy = np.zeros((pts_per_window, 1))
         QXYyy = np.zeros((pts_per_window, 1))
 
-        Wxxx = np.zeros((pts_per_window, 1))
-        Wxxy = np.zeros((pts_per_window, 1))
-        Wxyy = np.zeros((pts_per_window, 1))
-        Wyyy = np.zeros((pts_per_window, 1))
-
-        Uxxx = np.zeros((pts_per_window, 1))
-        Uxxy = np.zeros((pts_per_window, 1))
-        Uxyy = np.zeros((pts_per_window, 1))
-        Uyyy = np.zeros((pts_per_window, 1))
-
-        Vxxx = np.zeros((pts_per_window, 1))
-
         QXXxxx = np.zeros((pts_per_window, 1))
         QXXxxy = np.zeros((pts_per_window, 1))
         QXXxyy = np.zeros((pts_per_window, 1))
@@ -473,14 +446,6 @@ class Anise(ActNem):
         QXYxxy = np.zeros((pts_per_window, 1))
         QXYxyy = np.zeros((pts_per_window, 1))
         QXYyyy = np.zeros((pts_per_window, 1))
-
-        Uxxxx = np.zeros((pts_per_window, 1))
-        Uxxxy = np.zeros((pts_per_window, 1))
-        Uxxyy = np.zeros((pts_per_window, 1))
-        Uxyyy = np.zeros((pts_per_window, 1))
-        Uyyyy = np.zeros((pts_per_window, 1))
-
-        Vxxxx = np.zeros((pts_per_window, 1))
 
         QXXxxxx = np.zeros((pts_per_window, 1))
         QXXxxxy = np.zeros((pts_per_window, 1))
@@ -503,7 +468,6 @@ class Anise(ActNem):
 
         # Pick random points in 3D space.
         diff_order = 5
-        n_diff = 2 * np.ceil(diff_order / 2.0)
         nb = int(np.ceil(diff_order / 2.0))
         inner_view = (slice(nb, -nb), slice(nb, -nb), slice(nb, -nb))
         (
@@ -794,7 +758,8 @@ class Anise(ActNem):
             Number of integration windows to select randomly
 
         window_size : tuple
-            Tuple containing 3 integers (NX, NY, NT), specifying the dimensions of the integration windows in x, y and t.
+            Tuple containing 3 integers (NX, NY, NT), specifying the dimensions of the
+            integration windows in x, y and t.
 
         sample : int
             Sample number to pick. Default is 1.
@@ -881,10 +846,8 @@ class Anise(ActNem):
 
             dx_Qxx = QXXx_view[inner_view]
             dy_Qxx = QXXy_view[inner_view]
-            dt_Qxx = QXXt_view[inner_view]
             dx_Qxy = QXYx_view[inner_view]
             dy_Qxy = QXYy_view[inner_view]
-            dt_Qxy = QXYt_view[inner_view]
 
             dx_u = ux_view[inner_view]
             dy_u = uy_view[inner_view]
@@ -893,7 +856,8 @@ class Anise(ActNem):
 
             dt_U_int[key] = -np.mean(u * dy_dt_psi - v * dx_dt_psi)
 
-            # U_dot_grad_U_int[key] = np.mean(u * v * (dy2_psi - dx2_psi) + (u**2 - v**2) * dx_dy_psi )
+            # U_dot_grad_U_int[key] = np.mean(u * v * (dy2_psi - dx2_psi)
+            # + (u**2 - v**2) * dx_dy_psi )
 
             U_dot_grad_U_int[key] = np.mean(
                 (u * dx_u + v * dy_u) * dy_psi - (u * dx_v + v * dy_v) * dx_psi
@@ -996,15 +960,9 @@ class Anise(ActNem):
 
         dx2_Rxx = Rxxf.grad(2, 0, 0)
         dy2_Rxx = Rxxf.grad(0, 2, 0)
-        dx_dy_Rxx = Rxxf.grad(1, 1, 0)
-        dy_dt_Rxx = Rxxf.grad(0, 1, 1)
-        dx_dt_Rxx = Rxxf.grad(1, 0, 1)
 
         dx2_Rxy = Rxyf.grad(2, 0, 0)
         dy2_Rxy = Rxyf.grad(0, 2, 0)
-        dx_dy_Rxy = Rxyf.grad(1, 1, 0)
-        dy_dt_Rxy = Rxyf.grad(0, 1, 1)
-        dx_dt_Rxy = Rxyf.grad(1, 0, 1)
 
         for key, view in tqdm(views.items()):
             u_view = self.u_all[view]
@@ -1022,12 +980,8 @@ class Anise(ActNem):
 
             dx_Qxx = QXXx_view[inner_view]
             dy_Qxx = QXXy_view[inner_view]
-            dt_Qxx = QXXt_view[inner_view]
             dx_Qxy = QXYx_view[inner_view]
             dy_Qxy = QXYy_view[inner_view]
-            dt_Qxy = QXYt_view[inner_view]
-
-            nu = Rxx * Qxy - Rxy * Qxx
 
             dx_nu = (dx_Rxx * Qxy + Rxx * dx_Qxy) - (dx_Rxy * Qxx + Rxy * dx_Qxx)
             dy_nu = (dy_Rxx * Qxy + Rxx * dy_Qxy) - (dy_Rxy * Qxx + Rxy * dy_Qxx)

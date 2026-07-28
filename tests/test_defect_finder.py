@@ -4,12 +4,12 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose
 
+from actnempy.utils import defect_finder as df
+
 test_dir = Path(__file__).parent.absolute()
 # The modules are two directories up
 module_dir = Path(__file__).resolve().parents[1].absolute()
 # sys.path.append(module_dir.as_posix())
-
-from actnempy.utils import defect_finder as df
 
 
 def defectpair(X, Y, dist, varphi1, varphi2, rcore=0.1):
@@ -45,7 +45,9 @@ class TestDefectFinder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """
-        This will generate an orientation profile with a +1/2 defect at (-5,0) and a -1/2 defect at (5,0). With varphi1=pi/3 and varphi2=0, we should get phi_p = 5.35589009 and phi_m=-0.19739556
+        This will generate an orientation profile with a +1/2 defect at (-5,0) and a -1/2 defect
+        at (5,0). With varphi1=pi/3 and varphi2=0, we should get phi_p = 5.35589009 and
+        phi_m=-0.19739556
         """
 
         cls.x = np.linspace(-10, 10, 100)

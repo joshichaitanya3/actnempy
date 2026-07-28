@@ -1,13 +1,10 @@
-import sys
 from pathlib import Path
 
 import numpy as np
 
+from actnempy import ActNem
+
 module_dir = Path(__file__).parent.parent.absolute()  # The modules are two directories up
-sys.path.append(module_dir.as_posix())
-
-from actnem import ActNem
-
 data_dir = module_dir / "TestData"
 
 actnem = ActNem(data_dir)

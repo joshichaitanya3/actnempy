@@ -153,13 +153,15 @@ def compute_Q(theta, sigma=1, custom_kernel=None):
         Values of Qxy
     """
 
-    average = lambda f: gaussian_filter(f, sigma=sigma)
+    def average(f):
+        return gaussian_filter(f, sigma=sigma)
     if custom_kernel is not None:
         if no_cv2:
             print("cv2 module not available.")
             print("Cannot generate custom kernel. Using default kernel...")
         else:
-            average = lambda f: cv2.filter2D(f, -1, custom_kernel)
+            def average(f):
+                return cv2.filter2D(f, -1, custom_kernel)
 
     nx = np.cos(theta)
     ny = np.sin(theta)
@@ -290,16 +292,20 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     num_points : int
         Number of samples required
     box_size : 3-tuple or int
-        Size of the box to be sampled. This can either be supplied as a 3-tuple, with one integer for each dimension, or an int, in which case a cubical box will be sampled.
+        Size of the box to be sampled. This can either be supplied as a 3-tuple, with one
+        integer for each dimension, or an int, in which case a cubical box will be sampled.
     diff_order : int
-        Number of derivatives of the original array the user is expecting to take. This is used to make sure points close to the boundary whose derivatives cannot be taken are not included in the boxes.
+        Number of derivatives of the original array the user is expecting to take. This is used
+        to make sure points close to the boundary whose derivatives cannot be taken are not
+        included in the boxes.
     seed : int, optional
         Seed for the random number generator. Defualt is 1.
 
     Returns
     -------
         points : dict
-            Dictionary containing the coordinates of the box centers, with the keys being the indices.
+            Dictionary containing the coordinates of the box centers, with the keys being the
+            indices.
         views : dict
             Dictionary containing the slices that return the box when indexed with.
 
@@ -323,8 +329,6 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     window = tuple([int(i + n_diff) for i in box_size])
 
     bdy = tuple([int((i + 1) / 2) for i in window])
-
-    box_bdy = tuple([int((i + 1) / 2) for i in box_size])
 
     # Now sample random points that lie between bdy and shp-bdy.
     # To speed things up, we will sample random points in each x, y and
@@ -352,7 +356,8 @@ def get_random_sample(shp, num_points, box_size, diff_order, seed=1):
     # different seed or for lesser number of points.
     if picked_points.shape[1] < num_points:
         raise ValueError(
-            "Couldn't sample enough number of unique points! Try a different seed for `get_random_sample` or try lesser number of points."
+            "Couldn't sample enough number of unique points! Try a different seed for "
+            "`get_random_sample` or try lesser number of points."
         )
 
     points = {}

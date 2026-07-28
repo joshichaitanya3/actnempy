@@ -12,17 +12,25 @@ class Benchmark(Anise):
         """
         add_noise_all(noise_strength, seed=None)
 
-        Function to add white Gaussian noise to all the fields in place. (Check the method `reset_data` to reset the data.) Uses NumPy's  random.default_rng() generator if available, and random.randn if not. This is done using a helper function `add_noise` (imported from the `utils`) to add the noise to each individual field.
+        Function to add white Gaussian noise to all the fields in place. (Check the method
+        `reset_data` to reset the data.) Uses NumPy's  random.default_rng() generator if
+        available, and random.randn if not. This is done using a helper function `add_noise`
+        (imported from the `utils`) to add the noise to each individual field.
 
         Parameters
         ----------
         noise_strength : float
-            Strength of the noise relative to the standard deviation. This is done per field across space and time.
+            Strength of the noise relative to the standard deviation. This is done per field
+            across space and time.
             Default is 0.01
         seed : {None, int, array_like[ints], SeedSequence, BitGenerator, Generator}, optional
             Seed for NumPy's default_rng(). From its description:
-            A seed to initialize the `BitGenerator`. If None, then fresh, unpredictable entropy will be pulled from the OS. If an ``int`` or ``array_like[ints]`` is passed, then it will be passed to `SeedSequence` to derive the initial `BitGenerator` state. One may also pass in a`SeedSequence` instance.
-            Additionally, when passed a `BitGenerator`, it will be wrapped by `Generator`. If passed a `Generator`, it will be returned unaltered.
+            A seed to initialize the `BitGenerator`. If None, then fresh, unpredictable entropy
+            will be pulled from the OS. If an ``int`` or ``array_like[ints]`` is passed, then it
+            will be passed to `SeedSequence` to derive the initial `BitGenerator` state. One may
+            also pass in a`SeedSequence` instance.
+            Additionally, when passed a `BitGenerator`, it will be wrapped by `Generator`. If
+            passed a `Generator`, it will be returned unaltered.
             If default_rng is not available, this will be used as a seed for the random.randn
         """
         self.Qxx_all = add_noise(self.Qxx_all, noise_strength, seed)
@@ -78,7 +86,6 @@ class Benchmark(Anise):
 
         r2s = np.zeros([samples, num_sizes])
         alphas = np.zeros([samples, num_sizes])
-        zetas = np.zeros([samples, num_sizes])
         frictions = np.zeros([samples, num_sizes])
 
         if noise_strength != 0:
@@ -86,7 +93,6 @@ class Benchmark(Anise):
 
         for j in range(samples):
             for i in range(num_sizes):
-                metadata = dict()
                 num_windows = 50
                 window_size = (WXs[i], WYs[i], WTs[i])
                 # window_size = (51, 51, WTs[i])
@@ -147,12 +153,14 @@ class Benchmark(Anise):
         )
         plt.ylabel(r"$\alpha/\eta$")
         # ax.plot(np.arange(1,num_sizes+1), z_mean, label=r'$\zeta$', color='y')
-        # ax.fill_between(np.arange(1,num_sizes+1), z_mean-z_std, z_mean+z_std, alpha=0.3, color='y')
+        # ax.fill_between(np.arange(1,num_sizes+1), z_mean-z_std, z_mean+z_std, alpha=0.3,
+        # color='y')
         plt.xlabel("Window size")
         ax.tick_params(direction="in")
         # ax2 = ax.twinx()
         # ax2.plot(np.arange(1,num_sizes+1), g_mean, label=r'$\Gamma$', color='m')
-        # ax2.fill_between(np.arange(1,num_sizes+1), g_mean-g_std, g_mean+g_std, alpha=0.3, color='m')
+        # ax2.fill_between(np.arange(1,num_sizes+1), g_mean-g_std, g_mean+g_std, alpha=0.3,
+        # color='m')
 
         plt.tight_layout()
         plt.savefig(f"{self.data_dir}/alpha_vs_window_size.svg", dpi=300)
