@@ -211,7 +211,7 @@ class ActNem:
         velocity = np.array([u, v])
         divu = self.grid2D.div(velocity)
         if plot:
-            _ = plt.figure(figsize=(5, 5))
+            fig = plt.figure(figsize=(5, 5))
             Qxx = self.Qxx_all[:, :, frame]
             Qxy = self.Qxy_all[:, :, frame]
             (_, nx, ny) = compute_n(Qxx, Qxy)
