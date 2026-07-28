@@ -437,7 +437,7 @@ class PDE:
             self.desc = pde["desc"]
 
         except KeyError:
-            print(f"Some keys not found. The PDE isn't saved properly!")
+            print("Some keys not found. The PDE isn't saved properly!")
 
     def plot_fvu(self, nterms=None, var="var", filename=None):
         """

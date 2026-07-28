@@ -79,10 +79,10 @@ class Anise(ActNem):
 
         # Import metadata
 
-        with open(f"{data_dir}/sindy_library_specs.json", "r") as f:
+        with open(f"{data_dir}/sindy_library_specs.json") as f:
             self.metadata = json.load(f)
 
-        with open(f"{data_dir}/metadata.json", "r") as f:
+        with open(f"{data_dir}/metadata.json") as f:
             self.metadata.update(json.load(f))
             self.dx = self.metadata["dx"]
             self.dy = self.metadata["dy"]

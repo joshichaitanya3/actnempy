@@ -87,7 +87,7 @@ class ActNem:
 
         # Import metadata
 
-        with open(f"{data_dir}/metadata.json", "r") as f:
+        with open(f"{data_dir}/metadata.json") as f:
             self.metadata = json.load(f)
 
         self.dx = self.metadata["dx"]

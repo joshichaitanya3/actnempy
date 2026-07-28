@@ -25,7 +25,7 @@ CLASSIFIERS = [
 
 here = pathlib.Path(__file__).parent
 
-with open(here / "requirements.txt", "r") as f:
+with open(here / "requirements.txt") as f:
     REQUIRED = f.readlines()
 
 # with open(here / "README.rst", "r") as f:
