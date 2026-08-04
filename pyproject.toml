@@ -1,6 +1,47 @@
+[project]
+name = "actnempy"
+version = "0.1.0"
+description = "Analysis Suite for 2D Active Nematics"
+readme = "README.md"
+authors = [
+  { name = "Chaitanya Joshi", email = "joshichaitanya3@pm.me" },
+  { name = "Matthew S. E. Peterson", email = "matthew.se.peterson@gmail.com" },
+  { name = "Michael M. Norton", email = "mike.m.norton@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "gdown>=4.4.0",
+    "matplotlib>=3.1.2",
+    "numpy>=1.20.0",
+    "pandas>=1.3.1",
+    "scikit-image>=0.18.1",
+    "scikit-learn>=1.0.2",
+    "scipy>=1.6.0",
+    "sympy>=1.7.1",
+    "tqdm>=4.56.2",
+    "trackpy>=0.5.0",
+]
+
+# Version is bumped and tagged manually for now. uv's native build backend
+# (uv_build, below) has no git-tag-derived versioning yet:
+# https://github.com/astral-sh/uv/issues/14037
+# If we need that before uv adds it, switch to build-backend = "hatchling.build"
+# with the "uv-dynamic-versioning" plugin (requires = ["hatchling", "uv-dynamic-versioning"]).
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.12.1,<0.13"]
+build-backend = "uv_build"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.5",
+    "ruff",
+]
+
+[project.urls]
+Homepage = "https://github.com/joshichaitanya3/actnempy"
+
+[tool.uv.build-backend]
+module-root = "."
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -9,7 +50,7 @@ filterwarnings = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
