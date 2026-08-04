@@ -11,17 +11,26 @@ For an example of a code used in the manuscript [Data-driven discovery of active
 
 # Installation
 
+This project uses [uv](https://docs.astral.sh/uv/) to manage dependencies and packaging.
+
 1. Clone this repository:
 
 ```
 git clone https://github.com/joshichaitanya3/actnempy.git
-```
-
-2. Install via `pip`
-
-```
-pip install wheel
 cd actnempy
+```
+
+2. Install with `uv`
+
+```
+uv sync
+```
+
+This creates a `.venv` with `actnempy` and its dependencies installed. Prefix commands with `uv run` (e.g. `uv run python`) to run them inside that environment, or activate it directly with `source .venv/bin/activate`.
+
+Alternatively, install with `pip` (without `uv`):
+
+```
 pip install .
 ```
 
@@ -29,22 +38,22 @@ pip install .
 
 The test suite uses Python's built-in `unittest` framework and can be run with `pytest`.
 
-First install the test dependencies:
+Install the `dev` extra, which includes `pytest`:
 
 ```
-pip install pytest gdown
+uv sync --extra dev
 ```
 
 Then run all tests from the repository root:
 
 ```
-pytest
+uv run pytest
 ```
 
 To run a specific test file:
 
 ```
-pytest tests/test_actnem.py -v
+uv run pytest tests/test_actnem.py -v
 ```
 
 > [!NOTE]
