@@ -231,17 +231,61 @@ def _(mo):
     mo.md(r"""
     #### We clearly see a steep shoulder at n=10
 
-    This is as indicated in the result from `sindy_int`. We can display the model at
-    any `n` using the `display_model` method.
+    This is as indicated in the result from `sindy_int`. Rather than take the shoulder
+    on faith, move the slider below: the marker tracks along the optimality curve while
+    the model at that sparsity is printed underneath. The trade-off the curve encodes
+    (accuracy against parsimony) is then something you can watch happen.
+
+    The curve is redrawn here from the PDE's `n_terms` and `fvu` attributes so that the
+    current `n` can be marked; `plot_fvu` above is the method to use for a publication
+    figure. The model itself comes from the `display_model` method.
     """)
     return
 
 
 @app.cell
-def _(mo):
-    num_terms = mo.ui.slider(1,30, step=1, value=10, label="Number of terms")
-    num_terms
+def _(an, mo):
+    num_terms = mo.ui.slider(
+        1,
+        min(30, len(an.pde_Qxx.n_terms)),
+        step=1,
+        value=10,
+        label="Number of terms",
+    )
     return (num_terms,)
+
+
+@app.cell
+def _(an, num_terms, plt):
+    _pde = an.pde_Qxx
+    _n = num_terms.value
+
+    _fig, _ax = plt.subplots(figsize=(5, 3))
+    _ax.semilogy(_pde.n_terms, _pde.fvu, "o-", markersize=4)
+    # fvu is ordered sparsest-first, so the model with _n terms sits at index _n - 1
+    _ax.semilogy(
+        _n,
+        _pde.fvu[_n - 1],
+        "o",
+        color="crimson",
+        markersize=13,
+        fillstyle="none",
+        markeredgewidth=2,
+    )
+    _ax.axvline(_pde.nopt, color="gray", linestyle="--", linewidth=1)
+    _ax.set_xlim([0, num_terms.stop + 0.5])
+    _ax.set_xlabel("Number of non-zero terms")
+    _ax.set_ylabel(r"$1 - R^2$")
+    _ax.set_title(f"n = {_n}   (shoulder at n = {_pde.nopt}, dashed)")
+    _fig.tight_layout()
+    _fig
+    return
+
+
+@app.cell
+def _(num_terms):
+    num_terms
+    return
 
 
 @app.cell
@@ -315,7 +359,7 @@ def _(mo):
 
 
 @app.cell
-def _(np):
+def _(an, np):
     from scipy.ndimage import gaussian_filter
     from tqdm import tqdm
 
@@ -324,83 +368,123 @@ def _(np):
         return np.sum(ab) / np.sqrt(np.sum(a**2) * np.sum(b**2))
 
 
-    def average(f):
-        return gaussian_filter(f, sigma=3)
+    def average(f, sigma):
+        return gaussian_filter(f, sigma=sigma)
 
-    return average, spatialcorr, tqdm
+
+    def curl_terms(frame, sigma):
+        """
+        Compute the two sides of the discovered flow equation, curl(div(Q)) and
+        curl(lap(u)), for a single frame, smoothing every field with a Gaussian
+        filter of width `sigma` beforehand.
+        """
+        Qxx = average(an.Qxx_all[:, :, frame], sigma)
+        Qxy = average(an.Qxy_all[:, :, frame], sigma)
+        Q = np.array([[Qxx, Qxy], [Qxy, -Qxx]])
+
+        u = average(an.u_all[:, :, frame], sigma)
+        v = average(an.v_all[:, :, frame], sigma)
+        vel = np.array([u, v])
+
+        grid2D = an.grid2D
+        curl_divQ = grid2D.curl(grid2D.div(Q))
+        curl_lap_vel = grid2D.curl(grid2D.lap(vel))
+
+        # Number of pixels to remove from the sides due to inaccuracy of derivatives at the boundary
+        skip = 5
+
+        return curl_divQ[skip:-skip, skip:-skip], curl_lap_vel[skip:-skip, skip:-skip]
+
+    return curl_terms, spatialcorr, tqdm
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ### Note above the value of `sigma` used for the averaging filter
+    ### The correlation over the whole trajectory
 
-    Lowering this value will result in a much larger error in
-    $\nabla\times \nabla^2 \vec{u}$ due to the 3 derivatives.
+    This is computed once, at the reference smoothing width $\sigma = 3$, since it
+    touches every frame.
     """)
     return
 
 
 @app.cell
-def _(an, average, np, plt, spatialcorr, tqdm):
+def _(an, curl_terms, np, plt, spatialcorr, tqdm):
     NT = an.NT
     corrs = np.zeros(NT)
     for i in tqdm(range(NT)):
-        Qxx = an.Qxx_all[:, :, i]
-        Qxy = an.Qxy_all[:, :, i]
+        _left, _right = curl_terms(i, 3)
+        corrs[i] = spatialcorr(_left, _right)
 
-        Qxx = average(Qxx)
-        Qxy = average(Qxy)
-
-        Q = np.array([[Qxx, Qxy], [Qxy, -Qxx]])
-        grid2D = an.grid2D
-
-        divQ = grid2D.div(Q)
-        curl_divQ = grid2D.curl(divQ)
-
-        u = an.u_all[:, :, i]
-        v = an.v_all[:, :, i]
-
-        u = average(u)
-        v = average(v)
-
-        vel = np.array([u, v])
-        lap_vel = grid2D.lap(vel)
-        curl_lap_vel = grid2D.curl(lap_vel)
-
-        # Number of pixels to remove from the sides due to inaccuracy of derivatives at the boundary
-        skip = 5
-
-        left = curl_divQ[skip:-skip, skip:-skip]
-        right = curl_lap_vel[skip:-skip, skip:-skip]
-
-        corrs[i] = spatialcorr(left, right)
+    plt.plot(corrs)
+    plt.xlabel("Time")
+    plt.ylabel("Correlation between strong form LHS and RHS")
+    plt.ylim([0, 1])
+    plt.tight_layout()
+    plt.show()
+    return (NT,)
 
 
-    figure_mosaic = """
-                    AB
-                    CC
-                    """
-    fig, ax = plt.subplot_mosaic(mosaic=figure_mosaic, figsize=(10, 8), facecolor="white")
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### The smoothing width `sigma` matters
 
-    plt.sca(ax["A"])
+    $\nabla\times \nabla^2 \vec{u}$ takes three derivatives of the velocity field, so
+    it is far more sensitive to noise than $\nabla\times\nabla\cdot Q$, which takes
+    one. Lowering `sigma` below the reference value of 3 should therefore degrade the
+    right-hand panel first, and with it the correlation.
+
+    Rather than assert that, drag the slider at the bottom: the two panels and the correlation
+    between them are recomputed for a single frame at whatever smoothing you choose.
+    """)
+    return
+
+
+@app.cell
+def _(NT, mo):
+    sigma = mo.ui.slider(0, 6, step=0.5, value=3, label="Smoothing width $\\sigma$")
+    frame = mo.ui.slider(0, NT - 1, step=1, value=NT - 1, label="Frame")
+    return frame, sigma
+
+
+@app.cell
+def _(curl_terms, frame, plt, sigma, spatialcorr):
+    left, right = curl_terms(frame.value, sigma.value)
+
+    fig, ax = plt.subplots(1, 2, figsize=(10, 4), facecolor="white")
+
+    plt.sca(ax[0])
     plt.pcolor(left, cmap="bwr")
-    ax["A"].set_aspect("equal")
+    ax[0].set_aspect("equal")
     plt.title(r"$\nabla\times\nabla\cdot Q$")
     plt.colorbar()
-    plt.sca(ax["B"])
+
+    plt.sca(ax[1])
     plt.pcolor(right, cmap="bwr")
-    ax["B"].set_aspect("equal")
+    ax[1].set_aspect("equal")
     plt.title(r"$\nabla\times \nabla^2 \vec{u}$")
     plt.colorbar()
-    plt.sca(ax["C"])
-    plt.plot(corrs)
-    plt.plot(NT, corrs[-1], "o", color="red", markersize=10, fillstyle="none")
-    plt.xlabel("Time")
-    plt.ylabel("Correlation")
-    # plt.suptitle("")
-    # plt.suptitle(f"{c} " + r"$\mu$" + "M ATP")
+
+    fig.suptitle(
+        f"frame {frame.value}, "
+        + r"$\sigma$"
+        + f" = {sigma.value}    correlation = {spatialcorr(left, right):.3f}"
+    )
+    plt.tight_layout()
     plt.show()
+    return
+
+
+@app.cell
+def _(frame, mo, sigma):
+    mo.vstack([sigma, frame])
+    return
+
+
+@app.cell
+def _():
     return
 
 

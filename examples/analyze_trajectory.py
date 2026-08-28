@@ -34,14 +34,12 @@ def _(mo):
 
 @app.cell
 def _():
-    import os
-
     import gdown
     import matplotlib.pyplot as plt
 
     from actnempy import ActNem
 
-    return ActNem, gdown, os, plt
+    return ActNem, gdown, plt
 
 
 @app.cell
@@ -51,8 +49,11 @@ def _(gdown, mo):
     data_dir = mo.notebook_dir().parent / "TestData"
     output = data_dir / "processed_data.npz"
 
-    gdown.download(url, str(output), quiet=False)
-    return (data_dir,)
+    # Only fetch the dataset if it isn't already on disk, so that re-running the
+    # notebook (or a reactive re-run of this cell) doesn't re-download it.
+    if not output.exists():
+        gdown.download(url, str(output), quiet=False)
+    return data_dir, output
 
 
 @app.cell
@@ -175,13 +176,30 @@ def _(an):
 def _(mo):
     mo.md(r"""
     ### Optionally delete the downloaded test dataset
+
+    This is behind a button rather than running on its own: marimo orders cells by
+    their dataflow, and a bare `remove` call depends only on the path, not on the
+    analysis above, so nothing would guarantee it ran last.
     """)
     return
 
 
 @app.cell
-def _(data_dir, os):
-    os.remove(data_dir / "processed_data.npz")
+def _(mo):
+    delete_button = mo.ui.run_button(label="Delete the downloaded test dataset")
+    delete_button
+    return (delete_button,)
+
+
+@app.cell
+def _(delete_button, mo, output):
+    mo.stop(
+        not delete_button.value,
+        mo.md(f"Dataset kept at `{output}`."),
+    )
+    if output.exists():
+        output.unlink()
+    mo.md(f"Deleted `{output}`.")
     return
 
 
