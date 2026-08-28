@@ -258,7 +258,7 @@ def print_pde(w, rhs_description, ut="u_t"):
         if w[i] != 0:
             if not first:
                 pde = pde + len(ut) * " " + "+ "
-            pde = pde + f"{w[i].real:g} " + rhs_description[i] + "\n   "
+            pde = pde + f"{float(w[i].real):g} " + rhs_description[i] + "\n   "
             first = False
     print(pde)
 

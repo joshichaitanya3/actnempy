@@ -67,4 +67,26 @@ Analysis of an entire trajectory is shown under [examples/analyze_trajectory.ipy
 
 Discovering the underlying PDE model from a trajectory using sparse regression methods as detailed in the manuscript [Data-driven discovery of active nematic hydrodynamics](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.129.258001) ([arXiv version here](https://arxiv.org/abs/2202.12854)) is shown under [examples/SINDy.ipynb](examples/SINDy.ipynb)
 
+### New: Marimo notebooks
+
+Reactive [Marimo](https://docs.marimo.io/) notebook versions of the Jupyter notebooks described above are now available. They provide additional functionality such as sliders to interactively vary defect detection hyper-parameters in [basic_example.py](examples/basic_example.py) and display model with different number of terms in [SINDy.py](examples/SINDy.py).
+
+These are tutorials, so the demonstration of the library usage is their goal, so open them with `marimo edit`:
+
+```bash
+uv run marimo edit examples/
+```
+
+Or to open a specific notebook:
+
+```bash
+uv run marimo edit examples/basic_example.py  
+```
+
+[basic_example.py](examples/basic_example.py) additionally stands on its own as a code-free, read-only app, in which the plot of the director with its annotated defects responds to the defect-detection hyper-parameters:
+
+```bash
+uv run marimo run examples/basic_example.py
+```
+
 _The model identification work detailed in the manuscript was supported by the Department of Energy (DOE) DE-SC0022291. Preliminary data and analysis were supported by the National Science Foundation (NSF) DMR-1855914 and the Brandeis Center for Bioinspired Soft Materials, an NSF MRSEC (DMR-2011846). Computing resources were provided by the NSF XSEDE allocation TG-MCB090163 (Stampede and Comet) and the Brandeis HPCC which is partially supported by the NSF through DMR-MRSEC 2011846 and OAC-1920147._
